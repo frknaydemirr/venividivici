@@ -1,0 +1,1204 @@
+swagger: '2.0'
+info:
+  title: venividivici
+  description: API documentation for venividici web app.
+  version: 0.0.1
+tags:
+  - name: cities
+    description: Info about cities of countries
+  - name: countries
+    description: Info about countries
+  - name: questions
+    description: Operations about questions of a city
+  - name: answers
+    description: Operations about answers to questions
+  - name: replies
+    description: Operations about replies to answers
+  - name: categories
+    description: Info about categories
+  - name: users
+    description: Operations about users
+  - name: votes
+    description: Operatios about voting
+
+paths:
+  /cities/{city-id}:
+    get:
+      tags:
+        - cities
+      summary: Get a specific city
+      description: Returns single city's data
+      parameters:
+        - name: city-id
+          in: path
+          description: City ID
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/get-city'
+
+  /cities/by-country/{country-id}:
+    get:
+      tags:
+        - cities
+      summary: Get cities that are in a specific country
+      description: Returns multiple cities
+      parameters:
+        - name: country-id
+          in: path
+          description: Country ID
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/get-multiple-cities'
+
+  /cities/search/{search-query}:
+    get:
+      tags:
+        - cities
+      summary: Get cities that match the query
+      description: Returns multiple cities
+      parameters:
+        - name: search-query
+          in: path
+          description: Search query text from the search box
+          required: true
+          type: string
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/get-multiple-cities'
+
+  /cities/{city-id}/image:
+    get:
+      tags:
+        - cities
+      summary: Get image for a specific city
+      description: Returns image as png
+      produces:
+        - image/png
+      parameters:
+        - name: city-id
+          in: path
+          description: City ID
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            type: file
+
+  /cities/{city-id}/info:
+    get:
+      tags:
+        - cities
+      summary: Get information text for a specific city
+      description: Returns city information
+      parameters:
+        - name: city-id
+          in: path
+          description: City ID
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/get-city-info'
+
+
+  /cities/most-conquered:
+    post:
+      tags:
+        - cities
+      summary: Get cities with most questions + answers
+      description: Returns multiple cities
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/get-multiple-cities'
+
+  /countries:
+    get:
+      tags:
+        - countries
+      summary: Get all countries
+      description: Returns all countries' name and ID
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/get-all-countries'
+
+  /countries/{country-id}:
+    get:
+      tags:
+        - countries
+      summary: Get a specific country
+      description: Returns single country's data
+      parameters:
+        - name: country-id
+          in: path
+          description: Country ID
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/get-country'
+
+  /countries/search/{search-query}:
+    get:
+      tags:
+        - countries
+      summary: Get countries that match the query
+      description: Returns multiple countries
+      parameters:
+        - name: search-query
+          in: path
+          description: Search query text from the search box
+          required: true
+          type: string
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/get-multiple-countries'
+
+  /countries/{country-id}/info:
+    get:
+      tags:
+        - countries
+      summary: Get information text for a specific country
+      description: Returns country information
+      parameters:
+        - name: country-id
+          in: path
+          description: Country ID
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/get-country-info'
+
+  /countries/{country-id}/image:
+    get:
+      tags:
+        - countries
+      summary: Get image (flag) for a specific country
+      description: Returns image (flag) as png
+      produces:
+        - image/png
+      parameters:
+        - name: country-id
+          in: path
+          description: Country ID
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            type: file
+
+  /countries/most-conquered:
+    post:
+      tags:
+        - countries
+      summary: Get countries with most questions + answers
+      description: Returns multiple countries
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/get-multiple-countries'
+
+  /questions:
+    post:
+      tags:
+        - questions
+      summary: Post a new question
+      description: Posts new question, if success; returns new question ID
+      parameters:
+        - name: body
+          in: body
+          description: Question object
+          required: true
+          schema:
+            $ref: '#/definitions/new-question'
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/new-question-id'
+
+
+  /questions/{question-id}:
+    get:
+      tags:
+        - questions
+      summary: Get a specific question
+      description: Returns singular question's data
+      parameters:
+        - name: question-id
+          in: path
+          description: Question ID
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: successful operation
+          schema:
+                $ref: '#/definitions/get-question'
+    delete:
+      tags:
+        - questions
+      summary: Delete a specific question
+      description: Deletes question, returns operation code
+      parameters:
+        - name: question-id
+          in: path
+          description: Question ID
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: "Deleted successfully"
+
+  /questions/most-answered:
+    get:
+      tags:
+        - questions
+      summary: Get most answered questions on whole site
+      description: Returns multiple questions
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/get-multiple-questions'
+
+  /questions/most-answered/by-city/{city-id}:
+    get:
+      tags:
+        - questions
+      summary: Get most answered questions for a specific city
+      description: Returns multiple questions
+      parameters:
+        - name: city-id
+          in: path
+          description: City ID
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/get-multiple-questions'
+
+  /questions/most-answered/by-country/{country-id}:
+    get:
+      tags:
+        - questions
+      summary: Get most answered questions for a specific country
+      description: Returns multiple questions
+      parameters:
+        - name: country-id
+          in: path
+          description: Country ID
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/get-multiple-questions'
+
+  /questions/recent:
+    get:
+      tags:
+        - questions
+      summary: Get recent questions on whole site
+      description: Returns multiple questions
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/get-multiple-questions'
+
+  /questions/recent/by-city/{city-id}:
+    get:
+      tags:
+        - questions
+      summary: Get recent questions for a specific city
+      description: Returns multiple questions
+      parameters:
+        - name: city-id
+          in: path
+          description: City ID
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/get-multiple-questions'
+
+  /questions/recent/by-country/{country-id}:
+    get:
+      tags:
+        - questions
+      summary: Get recent questions for a specific country
+      description: Returns multiple questions
+      parameters:
+        - name: country-id
+          in: path
+          description: Country ID
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/get-multiple-questions'
+
+  /questions/by-city/{city-id}/by-category/{category-id}/{search-query}:
+    get:
+      tags:
+        - questions
+      summary: Get questions that match the search query, for a specific city and in a specific category
+      description: Returns multiple questions
+      parameters:
+        - name: search-query
+          in: path
+          description: Search query text from the search box
+          required: true
+          type: string
+        - name: city-id
+          in: path
+          description: City ID
+          required: true
+          type: integer
+        - name: category-id
+          in: path
+          description: Category ID
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/get-multiple-questions'
+
+  /questions/by-country/{country-id}/by-category/{category-id}/{search-query}:
+    get:
+      tags:
+        - questions
+      summary: Get questions that match the search query, for a specific country and in a specific category
+      description: Returns multiple questions
+      parameters:
+        - name: search-query
+          in: path
+          description: Search query text from the search box
+          required: true
+          type: string
+        - name: country-id
+          in: path
+          description: Country ID
+          required: true
+          type: integer
+        - name: category-id
+          in: path
+          description: Category ID
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: successful operation
+          schema:
+                $ref: '#/definitions/get-multiple-questions'
+
+  /questions/by-city/{city-id}/{search-query}:
+    get:
+      tags:
+        - questions
+      summary: Get questions that match the search query for a specific city
+      description: Returns multiple questions
+      parameters:
+        - name: search-query
+          in: path
+          description: Search query text from the search box
+          required: true
+          type: string
+        - name: city-id
+          in: path
+          description: City ID
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: successful operation
+          schema:
+                $ref: '#/definitions/get-multiple-questions'
+
+  /questions/by-country/{country-id}/{search-query}:
+    get:
+      tags:
+        - questions
+      summary: Get questions that match the search query for a specific country
+      description: Returns multiple questions
+      parameters:
+        - name: search-query
+          in: path
+          description: Search query text from the search box
+          required: true
+          type: string
+        - name: country-id
+          in: path
+          description: Country ID
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: successful operation
+          schema:
+                $ref: '#/definitions/get-multiple-questions'
+
+
+  /users/{user-id}/subscriptions/questions:
+    get:
+      tags:
+        - questions
+        - users
+      summary: Get questions which the user is subscribed to their city/country
+      description: Returns multiple questions
+      parameters:
+        - name: user-id
+          in: path
+          description: User ID
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/get-multiple-questions'
+
+
+  /answers:
+    post:
+      tags:
+        - answers
+      summary: Post a new answer
+      description: Posts new answer
+      parameters:
+        - name: body
+          in: body
+          description: Answer object
+          required: true
+          schema:
+            $ref: '#/definitions/new-answer'
+      responses:
+        '200':
+          description: successful operation
+
+  /answers/{answer-id}:
+    get:
+      tags:
+        - answers
+      summary: Get a spesific answer
+      description: Returns a spesific answer
+      parameters:
+        - name: answer-id
+          in: path
+          description: Answer ID
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/get-answer'
+    delete:
+      tags:
+        - answers
+      summary: Delete a specific answer
+      description: Deletes answer, returns operation code
+      parameters:
+        - name: answer-id
+          in: path
+          description: Answer ID
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: "Deleted successfully"
+
+  /answers/by-question/{question-id}:
+    get:
+      tags:
+        - answers
+      summary: Get answers of a specific question
+      description: Returns multiple answers
+      parameters:
+        - name: question-id
+          in: path
+          description: Question ID
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/get-multiple-answers'
+
+  /replies/by-answer/{answer-id}:
+    post:
+      tags:
+        - replies
+      summary: Gets replies of a specific answer
+      description: Returns multiple replies
+      parameters:
+        - name: answer-id
+          in: path
+          description: Answer ID
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/get-multiple-replies'
+
+  /replies:
+    post:
+      tags:
+        - replies
+      summary: Post a new reply
+      description: Posts new reply
+      parameters:
+        - name: body
+          in: body
+          description: Reply object
+          required: true
+          schema:
+            $ref: '#/definitions/new-reply'
+      responses:
+        '200':
+          description: successful operation
+
+  /replies/{reply-id}:
+    get:
+      tags:
+        - replies
+      summary: Get a spesific reply
+      description: Returns a spesific reply
+      parameters:
+        - name: reply-id
+          in: path
+          description: Reply ID
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/get-reply'
+    delete:
+      tags:
+        - replies
+      summary: Delete a specific reply
+      description: Deletes reply, returns operation code
+      parameters:
+        - name: reply-id
+          in: path
+          description: Reply ID
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: "Deleted successfully"
+
+  /categories:
+    post:
+      tags:
+        - categories
+      summary: Gets all categories in site
+      description: Returns multiple categories
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/get-all-categories'
+
+  /categories/by-city/{city-id}:
+    get:
+      tags:
+        - categories
+      summary: Get all categories with stats for a specific city
+      description: Returns multiple categories with stats
+      parameters:
+        - name: city-id
+          in: path
+          description: City ID
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/get-multiple-categories-with-stats'
+
+  /categories/by-country/{country-id}:
+    get:
+      tags:
+        - categories
+      summary: Get all categories with stats for a specific country
+      description: Returns multiple categories with stats
+      parameters:
+        - name: country-id
+          in: path
+          description: Country ID
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/get-multiple-categories-with-stats'
+
+  /users/{username}/img:
+    get:
+      tags:
+        - users
+      summary: Get profile picture for a specific user
+      description: Returns image (profile picture) as png
+      produces:
+        - image/png
+      parameters:
+        - name: username
+          in: path
+          description: Username
+          required: true
+          type: string
+          maxLength: 32
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            type: file
+
+  /votes/questions/{question-id}:
+    get:
+      tags:
+        - votes
+      summary: Get user's vote for a specific question
+      description: Returns vote type for a specific question
+      parameters:
+        - name: question-id
+          in: path
+          description: Question ID
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/get-question-vote'
+    post:
+      tags:
+        - votes
+      summary: Vote a specific question
+      description: Posts the vote for a specific question, returns status
+      parameters:
+        - name: question-id
+          in: path
+          description: Question ID
+          required: true
+          type: integer
+        - name: body
+          in: body
+          description: Vote body
+          required: true
+          schema:
+            $ref: '#/definitions/post-question-vote'
+      responses:
+        '200':
+          description: successful operation
+    delete:
+      tags:
+        - votes
+      summary: Delete user's vote for a specific question
+      parameters:
+        - name: question-id
+          in: path
+          description: Question ID
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: successful operation
+
+  /votes/answers/{answer-id}:
+    get:
+      tags:
+        - votes
+      summary: Get user's vote for a specific answer
+      description: Returns vote type for a specific answer
+      parameters:
+        - name: answer-id
+          in: path
+          description: Answer ID
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/get-answer-vote'
+    post:
+      tags:
+        - votes
+      summary: Vote a specific answer
+      description: Posts the answer for a specific answer, returns status
+      parameters:
+        - name: answer-id
+          in: path
+          description: Answer ID
+          required: true
+          type: integer
+        - name: body
+          in: body
+          description: Vote body
+          required: true
+          schema:
+            $ref: '#/definitions/post-answer-vote'
+      responses:
+        '200':
+          description: successful operation
+    delete:
+      tags:
+        - votes
+      summary: Delete user's vote for a specific answer
+      parameters:
+        - name: answer-id
+          in: path
+          description: Answer ID
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: successful operation
+
+  /votes/replies/{reply-id}:
+    get:
+      tags:
+        - votes
+      summary: Get user's vote for a specific reply
+      description: Returns vote type for a specific reply
+      parameters:
+        - name: reply-id
+          in: path
+          description: Reply ID
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/get-reply-vote'
+    post:
+      tags:
+        - votes
+      summary: Vote a specific question
+      description: Posts the vote for a specific reply, returns status
+      parameters:
+        - name: reply-id
+          in: path
+          description: Reply ID
+          required: true
+          type: integer
+        - name: body
+          in: body
+          description: Vote body
+          required: true
+          schema:
+            $ref: '#/definitions/post-reply-vote'
+      responses:
+        '200':
+          description: successful operation
+    delete:
+      tags:
+        - votes
+      summary: Delete user's vote for a specific reply
+      parameters:
+        - name: reply-id
+          in: path
+          description: Reply ID
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: successful operation
+
+
+definitions:
+  get-city:
+    type: object
+    properties:
+      city-id:
+        type: integer
+        format: int32
+        example: 47983324
+      city-name:
+        type: string
+        maxLength: 256
+        example: "Tallinn"
+      question-count:
+        type: integer
+        format: int32
+        example: 34
+      answer-count:
+        type: integer
+        format: int32
+        example: 123
+
+  get-multiple-cities:
+    type: array
+    items:
+      $ref: '#/definitions/get-city'
+    maxItems: 10
+
+  get-city-info:
+    type: string
+    maxLength: 10000
+
+  get-all-countries:
+    type: array
+    items:
+      type: object
+      properties:
+        country-id:
+          type: integer
+          format: int32
+          example: 39576293
+        country-name:
+          type: string
+          maxLength: 256
+          example: Turkiye
+
+  get-country:
+    type: object
+    properties:
+      country-id:
+        type: integer
+        format: int32
+        example: 47983324
+      country-name:
+        type: string
+        maxLength: 256
+        example: "Zimbabwe"
+      question-count:
+        type: integer
+        format: int32
+        example: 34
+      answer-count:
+        type: integer
+        format: int32
+        example: 123
+
+  get-multiple-countries:
+    type: array
+    items:
+      $ref: '#/definitions/get-country'
+    maxItems: 10
+
+  get-country-info:
+    type: string
+    maxLength: 10000
+
+  get-question:
+    type: object
+    properties:
+      question-id:
+        type: integer
+        format: int32
+        example: 85307412
+      question-title:
+        type: string
+        maxLength: 150
+        example: "Some example question title?"
+      question-body:
+        type: string
+        maxLength: 5000
+        example: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+      user-id:
+        type: integer
+        format: int32
+        example: 38702341
+      username:
+        type: string
+        maxLength: 32
+        example: mad_dogo_69
+      creation-time:
+        type: string
+        format: date-time
+        example: "2017-07-21T17:32:28Z"
+      vote-count:
+        type: integer
+        example: -23
+      answer-count:
+        type: integer
+        example: 120
+      categories:
+        type: array
+        items:
+          $ref: '#/definitions/get-category'
+      city-id:
+        type: integer
+        format: int32
+        example: 47983324
+      city-name:
+        type: string
+        maxLength: 256
+        example: "Tallinn"
+      country-id:
+        type: integer
+        format: int32
+        example: 47324988
+      country-name:
+        type: string
+        maxLength: 256
+        example: "Estonia"
+
+  get-question-short:
+    type: object
+    properties:
+      question-id:
+        type: integer
+        format: int32
+        example: 85307412
+      question-title:
+        type: string
+        maxLength: 75
+        example: "Some example question title?"
+      question-body:
+        type: string
+        maxLength: 200
+        example: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+      user-id:
+        type: integer
+        format: int32
+        example: 38702341
+      username:
+        type: string
+        maxLength: 32
+        example: mad_dogo_69
+      creation-time:
+        type: string
+        format: date-time
+        example: "2017-07-21T17:32:28Z"
+      vote-count:
+        type: integer
+        example: -23
+      answer-count:
+        type: integer
+        example: 120
+      categories:
+        type: array
+        items:
+          $ref: '#/definitions/get-category'
+      city-id:
+        type: integer
+        format: int32
+        example: 47983324
+      city-name:
+        type: string
+        maxLength: 256
+        example: "Tallinn"
+      country-id:
+        type: integer
+        format: int32
+        example: 47324988
+      country-name:
+        type: string
+        maxLength: 256
+        example: "Estonia"
+
+  get-multiple-questions:
+    type: array
+    items:
+      $ref: '#/definitions/get-question-short'
+    maxItems: 10
+
+  get-answer:
+    type: object
+    properties:
+      answer-id:
+        type: integer
+        format: int32
+        example: 85307412
+      question-id:
+        type: integer
+        format: int32
+        example: 93027422
+      user-id:
+        type: integer
+        format: int32
+        example: 38702341
+      username:
+        type: string
+        maxLength: 32
+        example: mad_dogo_69
+      vote-count:
+        type: integer
+        example: 55
+      reply-count:
+        type: integer
+        example: 120
+      answer-body:
+        type: string
+        maxLength: 2500
+        example: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+      creation-time:
+        type: string
+        format: date-time
+        example: "2017-07-21T17:32:28Z"
+
+  get-multiple-answers:
+    type: array
+    items:
+      $ref: '#/definitions/get-answer'
+    maxItems: 10
+
+  get-reply:
+    type: object
+    properties:
+      reply-id:
+        type: integer
+        format: int32
+        example: 85307412
+      answer-id:
+        type: integer
+        format: int32
+        example: 93027422
+      user-id:
+        type: integer
+        format: int32
+        example: 38702341
+      username:
+        type: string
+        maxLength: 32
+        example: mad_dogo_69
+      vote-count:
+        type: integer
+        example: 55
+      reply-body:
+        type: string
+        maxLength: 2500
+        example: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+      creation-time:
+        type: string
+        format: date-time
+        example: "2017-07-21T17:32:28Z"
+
+  get-multiple-replies:
+    type: array
+    items:
+      $ref: '#/definitions/get-reply'
+    maxItems: 10
+
+  get-category:
+    type: object
+    properties:
+      category-id:
+        type: integer
+        format: int32
+        example: 82832332
+      category-label:
+        type: string
+        maxLength: 64
+        example: "Food & Drinks"
+
+
+  get-all-categories:
+    type: array
+    items:
+      $ref: '#/definitions/get-category'
+    maxItems: 10
+
+  get-multiple-categories-with-stats:
+    type: array
+    items:
+      type: object
+      properties:
+        category-id:
+          type: integer
+          format: int32
+          example: 82832332
+        category-label:
+          type: string
+          maxLength: 64
+          example: "Food & Drinks"
+        question-count:
+          type: integer
+          example: 55
+        answer-count:
+          type: integer
+          example: 13
+
+  get-question-vote:
+    type: object
+    properties:
+      user-id:
+        type: integer
+        format: int32
+        example: 38702341
+      question-id:
+        type: integer
+        format: int32
+        example: 93027422
+      vote-type:
+        type: boolean
+        example: false
+
+  get-answer-vote:
+    type: object
+    properties:
+      user-id:
+        type: integer
+        format: int32
+        example: 38702341
+      answer-id:
+        type: integer
+        format: int32
+        example: 93027422
+      vote-type:
+        type: boolean
+        example: false
+
+  get-reply-vote:
+    type: object
+    properties:
+      user-id:
+        type: integer
+        format: int32
+        example: 38702341
+      reply-id:
+        type: integer
+        format: int32
+        example: 93027422
+      vote-type:
+        type: boolean
+        example: false

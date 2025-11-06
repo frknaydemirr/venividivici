@@ -1,1 +1,14 @@
+# v0.0.1
 
+Initial version of the project. Includes API contract, UI designs, DB models and reports (starting report and visa). No implementation (code). Truly sorry ask :(
+
+[x] UI mockup including all pages
+[x] Decision of tools and frameworks to use
+[x] DB design (the general one)
+[ ] ER model for DB
+[ ] API contract
+    x Endpoints
+    x Schemas
+    x Auth restrictions
+    x Paging - Rate limiting
+[x] Repo structure and versioning decisions

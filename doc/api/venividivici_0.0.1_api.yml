@@ -10,6 +10,8 @@ tags:
     description: Info about countries
   - name: questions
     description: Operations about questions of a city
+  - name: search
+    description: Search operations
   - name: answers
     description: Operations about answers to questions
   - name: replies
@@ -19,7 +21,9 @@ tags:
   - name: users
     description: Operations about users
   - name: votes
-    description: Operatios about voting
+    description: Operations about voting
+  - name: subscriptions
+    description: Operations about subscriptions
 
 paths:
   /cities/{city-id}:
@@ -39,6 +43,8 @@ paths:
           description: successful operation
           schema:
             $ref: '#/definitions/get-city'
+        default:
+          description: Unexpected error
 
   /cities/by-country/{country-id}:
     get:
@@ -52,29 +58,22 @@ paths:
           description: Country ID
           required: true
           type: integer
+        - name: offset
+          in: query
+          type: integer
+          description: Offset
+        - name: count
+          in: query
+          type: integer
+          maximum: 10
+          description: No of entries to return
       responses:
         '200':
           description: successful operation
           schema:
             $ref: '#/definitions/get-multiple-cities'
-
-  /cities/search/{search-query}:
-    get:
-      tags:
-        - cities
-      summary: Get cities that match the query
-      description: Returns multiple cities
-      parameters:
-        - name: search-query
-          in: path
-          description: Search query text from the search box
-          required: true
-          type: string
-      responses:
-        '200':
-          description: successful operation
-          schema:
-            $ref: '#/definitions/get-multiple-cities'
+        default:
+          description: Unexpected error
 
   /cities/{city-id}/image:
     get:
@@ -95,6 +94,8 @@ paths:
           description: successful operation
           schema:
             type: file
+        default:
+          description: Unexpected error
 
   /cities/{city-id}/info:
     get:
@@ -113,10 +114,11 @@ paths:
           description: successful operation
           schema:
             $ref: '#/definitions/get-city-info'
-
+        default:
+          description: Unexpected error
 
   /cities/most-conquered:
-    post:
+    get:
       tags:
         - cities
       summary: Get cities with most questions + answers
@@ -126,6 +128,8 @@ paths:
           description: successful operation
           schema:
             $ref: '#/definitions/get-multiple-cities'
+        default:
+          description: Unexpected error
 
   /countries:
     get:
@@ -138,6 +142,8 @@ paths:
           description: successful operation
           schema:
             $ref: '#/definitions/get-all-countries'
+        default:
+          description: Unexpected error
 
   /countries/{country-id}:
     get:
@@ -156,24 +162,8 @@ paths:
           description: successful operation
           schema:
             $ref: '#/definitions/get-country'
-
-  /countries/search/{search-query}:
-    get:
-      tags:
-        - countries
-      summary: Get countries that match the query
-      description: Returns multiple countries
-      parameters:
-        - name: search-query
-          in: path
-          description: Search query text from the search box
-          required: true
-          type: string
-      responses:
-        '200':
-          description: successful operation
-          schema:
-            $ref: '#/definitions/get-multiple-countries'
+        default:
+          description: Unexpected error
 
   /countries/{country-id}/info:
     get:
@@ -192,6 +182,8 @@ paths:
           description: successful operation
           schema:
             $ref: '#/definitions/get-country-info'
+        default:
+          description: Unexpected error
 
   /countries/{country-id}/image:
     get:
@@ -212,9 +204,11 @@ paths:
           description: successful operation
           schema:
             type: file
+        default:
+          description: Unexpected error
 
   /countries/most-conquered:
-    post:
+    get:
       tags:
         - countries
       summary: Get countries with most questions + answers
@@ -224,6 +218,8 @@ paths:
           description: successful operation
           schema:
             $ref: '#/definitions/get-multiple-countries'
+        default:
+          description: Unexpected error
 
   /questions:
     post:
@@ -237,13 +233,14 @@ paths:
           description: Question object
           required: true
           schema:
-            $ref: '#/definitions/new-question'
+            $ref: '#/definitions/post-new-question'
       responses:
         '200':
           description: successful operation
           schema:
-            $ref: '#/definitions/new-question-id'
-
+            $ref: '#/definitions/get-new-question-id'
+        default:
+          description: Unexpected error
 
   /questions/{question-id}:
     get:
@@ -262,6 +259,8 @@ paths:
           description: successful operation
           schema:
                 $ref: '#/definitions/get-question'
+        default:
+          description: Unexpected error
     delete:
       tags:
         - questions
@@ -276,9 +275,21 @@ paths:
       responses:
         '200':
           description: "Deleted successfully"
+        default:
+          description: Unexpected error
 
   /questions/most-answered:
     get:
+      parameters:
+        - name: offset
+          in: query
+          type: integer
+          description: Offset
+        - name: count
+          in: query
+          type: integer
+          maximum: 10
+          description: No of entries to return
       tags:
         - questions
       summary: Get most answered questions on whole site
@@ -288,6 +299,8 @@ paths:
           description: successful operation
           schema:
             $ref: '#/definitions/get-multiple-questions'
+        default:
+          description: Unexpected error
 
   /questions/most-answered/by-city/{city-id}:
     get:
@@ -301,11 +314,22 @@ paths:
           description: City ID
           required: true
           type: integer
+        - name: offset
+          in: query
+          type: integer
+          description: Offset
+        - name: count
+          in: query
+          type: integer
+          maximum: 10
+          description: No of entries to return
       responses:
         '200':
           description: successful operation
           schema:
             $ref: '#/definitions/get-multiple-questions'
+        default:
+          description: Unexpected error
 
   /questions/most-answered/by-country/{country-id}:
     get:
@@ -319,14 +343,35 @@ paths:
           description: Country ID
           required: true
           type: integer
+        - name: offset
+          in: query
+          type: integer
+          description: Offset
+        - name: count
+          in: query
+          type: integer
+          maximum: 10
+          description: No of entries to return
       responses:
         '200':
           description: successful operation
           schema:
             $ref: '#/definitions/get-multiple-questions'
+        default:
+          description: Unexpected error
 
   /questions/recent:
     get:
+      parameters:
+        - name: offset
+          in: query
+          type: integer
+          description: Offset
+        - name: count
+          in: query
+          type: integer
+          maximum: 10
+          description: No of entries to return
       tags:
         - questions
       summary: Get recent questions on whole site
@@ -336,6 +381,8 @@ paths:
           description: successful operation
           schema:
             $ref: '#/definitions/get-multiple-questions'
+        default:
+          description: Unexpected error
 
   /questions/recent/by-city/{city-id}:
     get:
@@ -349,11 +396,22 @@ paths:
           description: City ID
           required: true
           type: integer
+        - name: offset
+          in: query
+          type: integer
+          description: Offset
+        - name: count
+          in: query
+          type: integer
+          maximum: 10
+          description: No of entries to return
       responses:
         '200':
           description: successful operation
           schema:
             $ref: '#/definitions/get-multiple-questions'
+        default:
+          description: Unexpected error
 
   /questions/recent/by-country/{country-id}:
     get:
@@ -367,17 +425,89 @@ paths:
           description: Country ID
           required: true
           type: integer
+        - name: offset
+          in: query
+          type: integer
+          description: Offset
+        - name: count
+          in: query
+          type: integer
+          maximum: 10
+          description: No of entries to return
       responses:
         '200':
           description: successful operation
           schema:
             $ref: '#/definitions/get-multiple-questions'
+        default:
+          description: Unexpected error
 
-  /questions/by-city/{city-id}/by-category/{category-id}/{search-query}:
+  /search/cities/{search-query}:
     get:
       tags:
+        - search
+        - cities
+      summary: Get cities that match the query
+      description: Returns multiple cities
+      parameters:
+        - name: search-query
+          in: path
+          description: Search query text from the search box
+          required: true
+          type: string
+        - name: offset
+          in: query
+          type: integer
+          description: Offset
+        - name: count
+          in: query
+          type: integer
+          maximum: 10
+          description: No of entries to return
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/get-multiple-cities'
+        default:
+          description: Unexpected error
+
+  /search/countries/{search-query}:
+    get:
+      tags:
+        - search
+        - countries
+      summary: Get countries that match the query
+      description: Returns multiple countries
+      parameters:
+        - name: search-query
+          in: path
+          description: Search query text from the search box
+          required: true
+          type: string
+        - name: offset
+          in: query
+          type: integer
+          description: Offset
+        - name: count
+          in: query
+          type: integer
+          maximum: 10
+          description: No of entries to return
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/get-multiple-countries'
+        default:
+          description: Unexpected error
+
+  /search/questions/{search-query}:
+    get:
+      tags:
+        - search
         - questions
-      summary: Get questions that match the search query, for a specific city and in a specific category
+      summary: Get questions that match the query and filtering via query parameters
       description: Returns multiple questions
       parameters:
         - name: search-query
@@ -385,115 +515,36 @@ paths:
           description: Search query text from the search box
           required: true
           type: string
+        - name: offset
+          in: query
+          type: integer
+          description: Offset
+        - name: count
+          in: query
+          type: integer
+          maximum: 10
+          description: No of entries to return
         - name: city-id
-          in: path
+          in: query
           description: City ID
-          required: true
+          type: integer
+        - name: country-id
+          in: query
+          description: Country ID
           type: integer
         - name: category-id
-          in: path
+          in: query
           description: Category ID
-          required: true
           type: integer
       responses:
         '200':
           description: successful operation
           schema:
             $ref: '#/definitions/get-multiple-questions'
-
-  /questions/by-country/{country-id}/by-category/{category-id}/{search-query}:
-    get:
-      tags:
-        - questions
-      summary: Get questions that match the search query, for a specific country and in a specific category
-      description: Returns multiple questions
-      parameters:
-        - name: search-query
-          in: path
-          description: Search query text from the search box
-          required: true
-          type: string
-        - name: country-id
-          in: path
-          description: Country ID
-          required: true
-          type: integer
-        - name: category-id
-          in: path
-          description: Category ID
-          required: true
-          type: integer
-      responses:
-        '200':
-          description: successful operation
-          schema:
-                $ref: '#/definitions/get-multiple-questions'
-
-  /questions/by-city/{city-id}/{search-query}:
-    get:
-      tags:
-        - questions
-      summary: Get questions that match the search query for a specific city
-      description: Returns multiple questions
-      parameters:
-        - name: search-query
-          in: path
-          description: Search query text from the search box
-          required: true
-          type: string
-        - name: city-id
-          in: path
-          description: City ID
-          required: true
-          type: integer
-      responses:
-        '200':
-          description: successful operation
-          schema:
-                $ref: '#/definitions/get-multiple-questions'
-
-  /questions/by-country/{country-id}/{search-query}:
-    get:
-      tags:
-        - questions
-      summary: Get questions that match the search query for a specific country
-      description: Returns multiple questions
-      parameters:
-        - name: search-query
-          in: path
-          description: Search query text from the search box
-          required: true
-          type: string
-        - name: country-id
-          in: path
-          description: Country ID
-          required: true
-          type: integer
-      responses:
-        '200':
-          description: successful operation
-          schema:
-                $ref: '#/definitions/get-multiple-questions'
-
-
-  /users/{user-id}/subscriptions/questions:
-    get:
-      tags:
-        - questions
-        - users
-      summary: Get questions which the user is subscribed to their city/country
-      description: Returns multiple questions
-      parameters:
-        - name: user-id
-          in: path
-          description: User ID
-          required: true
-          type: integer
-      responses:
-        '200':
-          description: successful operation
-          schema:
-            $ref: '#/definitions/get-multiple-questions'
+        default:
+          description: Unexpected error 
+          
+        
 
 
   /answers:
@@ -508,10 +559,14 @@ paths:
           description: Answer object
           required: true
           schema:
-            $ref: '#/definitions/new-answer'
+            $ref: '#/definitions/post-new-answer'
       responses:
         '200':
           description: successful operation
+          schema:
+            $ref: '#/definitions/get-new-answer-id'
+        default:
+          description: Unexpected error
 
   /answers/{answer-id}:
     get:
@@ -530,6 +585,8 @@ paths:
           description: successful operation
           schema:
             $ref: '#/definitions/get-answer'
+        default:
+          description: Unexpected error
     delete:
       tags:
         - answers
@@ -544,6 +601,8 @@ paths:
       responses:
         '200':
           description: "Deleted successfully"
+        default:
+          description: Unexpected error
 
   /answers/by-question/{question-id}:
     get:
@@ -557,14 +616,26 @@ paths:
           description: Question ID
           required: true
           type: integer
+        - name: offset
+          in: query
+          type: integer
+          description: Offset
+        - name: count
+          in: query
+          type: integer
+          maximum: 10
+          description: No of entries to return
       responses:
         '200':
           description: successful operation
           schema:
             $ref: '#/definitions/get-multiple-answers'
+        default:
+          description: Unexpected error
+
 
   /replies/by-answer/{answer-id}:
-    post:
+    get:
       tags:
         - replies
       summary: Gets replies of a specific answer
@@ -575,11 +646,22 @@ paths:
           description: Answer ID
           required: true
           type: integer
+        - name: offset
+          in: query
+          type: integer
+          description: Offset
+        - name: count
+          in: query
+          type: integer
+          maximum: 10
+          description: No of entries to return
       responses:
         '200':
           description: successful operation
           schema:
             $ref: '#/definitions/get-multiple-replies'
+        default:
+          description: Unexpected error
 
   /replies:
     post:
@@ -593,10 +675,14 @@ paths:
           description: Reply object
           required: true
           schema:
-            $ref: '#/definitions/new-reply'
+            $ref: '#/definitions/post-new-reply'
       responses:
         '200':
           description: successful operation
+          schema:
+            $ref: '#/definitions/get-new-reply-id'
+        default:
+          description: Unexpected error
 
   /replies/{reply-id}:
     get:
@@ -615,6 +701,8 @@ paths:
           description: successful operation
           schema:
             $ref: '#/definitions/get-reply'
+        default:
+          description: Unexpected error
     delete:
       tags:
         - replies
@@ -629,9 +717,11 @@ paths:
       responses:
         '200':
           description: "Deleted successfully"
+        default:
+          description: Unexpected error
 
   /categories:
-    post:
+    get:
       tags:
         - categories
       summary: Gets all categories in site
@@ -641,6 +731,8 @@ paths:
           description: successful operation
           schema:
             $ref: '#/definitions/get-all-categories'
+        default:
+          description: Unexpected error
 
   /categories/by-city/{city-id}:
     get:
@@ -659,6 +751,8 @@ paths:
           description: successful operation
           schema:
             $ref: '#/definitions/get-multiple-categories-with-stats'
+        default:
+          description: Unexpected error
 
   /categories/by-country/{country-id}:
     get:
@@ -677,6 +771,8 @@ paths:
           description: successful operation
           schema:
             $ref: '#/definitions/get-multiple-categories-with-stats'
+        default:
+          description: Unexpected error
 
   /users/{username}/img:
     get:
@@ -698,6 +794,8 @@ paths:
           description: successful operation
           schema:
             type: file
+        default:
+          description: Unexpected error
 
   /votes/questions/{question-id}:
     get:
@@ -716,6 +814,8 @@ paths:
           description: successful operation
           schema:
             $ref: '#/definitions/get-question-vote'
+        default:
+          description: Unexpected error
     post:
       tags:
         - votes
@@ -736,6 +836,8 @@ paths:
       responses:
         '200':
           description: successful operation
+        default:
+          description: Unexpected error
     delete:
       tags:
         - votes
@@ -749,6 +851,8 @@ paths:
       responses:
         '200':
           description: successful operation
+        default:
+          description: Unexpected error
 
   /votes/answers/{answer-id}:
     get:
@@ -767,6 +871,8 @@ paths:
           description: successful operation
           schema:
             $ref: '#/definitions/get-answer-vote'
+        default:
+          description: Unexpected error
     post:
       tags:
         - votes
@@ -787,6 +893,8 @@ paths:
       responses:
         '200':
           description: successful operation
+        default:
+          description: Unexpected error
     delete:
       tags:
         - votes
@@ -800,6 +908,8 @@ paths:
       responses:
         '200':
           description: successful operation
+        default:
+          description: Unexpected error
 
   /votes/replies/{reply-id}:
     get:
@@ -818,6 +928,8 @@ paths:
           description: successful operation
           schema:
             $ref: '#/definitions/get-reply-vote'
+        default:
+          description: Unexpected error
     post:
       tags:
         - votes
@@ -838,6 +950,8 @@ paths:
       responses:
         '200':
           description: successful operation
+        default:
+          description: Unexpected error
     delete:
       tags:
         - votes
@@ -851,7 +965,219 @@ paths:
       responses:
         '200':
           description: successful operation
+        default:
+          description: Unexpected error
 
+  /subscriptions/questions/{user-id}:
+    get:
+      tags:
+        - subscriptions
+        - users
+        - questions
+      summary: Get all questions from subscribed cities/countries for a specific user
+      description: Returns multiple questions
+      parameters:
+        - name: user-id
+          in: path
+          description: User ID
+          required: true
+          type: integer
+        - name: offset
+          in: query
+          type: integer
+          description: Offset
+        - name: count
+          in: query
+          type: integer
+          maximum: 10
+          description: No of entries to return
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/get-multiple-questions'
+        default:
+          description: Unexpected error
+
+  /subscriptions/cities/{user-id}:
+    get:
+      tags:
+        - subscriptions
+        - users
+        - cities
+      summary: Get all cities which a specific user is subscribed to.
+      description: Returns multiple cities (id+name)
+      parameters:
+        - name: user-id
+          in: path
+          description: User ID
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/get-multiple-cities-without-counts'
+        default:
+          description: Unexpected error
+    post:
+      tags:
+        - subscriptions
+        - users
+        - cities
+      summary: Subscribe/unsubscribe to a city
+      parameters:
+        - name: user-id
+          in: path
+          description: User ID
+          required: true
+          type: integer
+        - name: body
+          in: body
+          description: Subscription type
+          required: true
+          schema:
+            $ref: '#/definitions/post-city-subscribe-unsubscribe'
+      responses:
+        '200':
+          description: successful operation
+        default:
+          description: Unexpected error
+
+  /subscriptions/countries/{user-id}:
+    get:
+      tags:
+        - subscriptions
+        - users
+        - countries
+      summary: Get all countries which a specific user is subscribed to.
+      description: Returns multiple countries (id+name)
+      parameters:
+        - name: user-id
+          in: path
+          description: User ID
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/get-all-countries'
+        default:
+          description: Unexpected error
+    post:
+      tags:
+        - subscriptions
+        - users
+        - countries
+      summary: Subscribe/unsubscribe to a country
+      parameters:
+        - name: user-id
+          in: path
+          description: User ID
+          required: true
+          type: integer
+        - name: body
+          in: body
+          description: Subscription type
+          required: true
+          schema:
+            $ref: '#/definitions/post-country-subscribe-unsubscribe'
+      responses:
+        '200':
+          description: successful operation
+        default:
+          description: Unexpected error
+
+  /questions/by-user/{user-id}:
+    get:
+      tags:
+        - questions
+        - users
+      parameters:
+        - name: user-id
+          in: path
+          description: User ID
+          required: true
+          type: integer
+        - name: offset
+          in: query
+          type: integer
+          description: Offset
+        - name: count
+          in: query
+          type: integer
+          maximum: 10
+          description: No of entries to return
+      summary: Get questions which are asked by a specific user
+      description: Returns multiple questions
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/get-multiple-questions'
+        default:
+          description: Unexpected error
+
+  /answers/by-user/{user-id}:
+    get:
+      tags:
+        - answers
+        - users
+      parameters:
+        - name: user-id
+          in: path
+          description: User ID
+          required: true
+          type: integer
+        - name: offset
+          in: query
+          type: integer
+          description: Offset
+        - name: count
+          in: query
+          type: integer
+          maximum: 10
+          description: No of entries to return
+      summary: Get answers which are written by a specific user
+      description: Returns multiple answers
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/get-multiple-answers'
+        default:
+          description: Unexpected error
+
+  /replies/by-user/{user-id}:
+    get:
+      tags:
+        - replies
+        - users
+      parameters:
+        - name: user-id
+          in: path
+          description: User ID
+          required: true
+          type: integer
+        - name: offset
+          in: query
+          type: integer
+          description: Offset
+        - name: count
+          in: query
+          type: integer
+          maximum: 10
+          description: No of entries to return
+      summary: Get replies which are replied by a specific user
+      description: Returns multiple replies
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/get-multiple-replies'
+        default:
+          description: Unexpected error
 
 definitions:
   get-city:
@@ -879,6 +1205,20 @@ definitions:
     items:
       $ref: '#/definitions/get-city'
     maxItems: 10
+
+  get-multiple-cities-without-counts:
+    type: array
+    items:
+      type: object
+      properties:
+        city-id:
+          type: integer
+          format: int32
+          example: 39576293
+        city-name:
+          type: string
+          maxLength: 256
+          example: Istanbul
 
   get-city-info:
     type: string
@@ -1202,3 +1542,142 @@ definitions:
       vote-type:
         type: boolean
         example: false
+
+  post-new-question:
+    type: object
+    properties:
+      user-id:
+        type: integer
+        format: int32
+        example: 38702341
+      city-id:
+        type: integer
+        format: int32
+        example: 47983324
+      question-title:
+        type: string
+        maxLength: 150
+        example: "Some example question title?"
+      question-body:
+        type: string
+        maxLength: 5000
+        example: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+      category-ids:
+        type: array
+        items:
+          type: integer
+          format: int32
+          example: 82832332
+
+  get-new-question-id:
+    description: Question ID
+    type: integer
+    format: int32
+    example: 93027422
+
+  post-new-answer:
+    type: object
+    properties:
+      user-id:
+        type: integer
+        format: int32
+        example: 38702341
+      question-id:
+        type: integer
+        format: int32
+        example: 93027422
+      answer-body:
+        type: string
+        maxLength: 2500
+        example: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+
+  get-new-answer-id:
+    description: Answer ID
+    type: integer
+    format: int32
+    example: 93027422
+
+  post-new-reply:
+    type: object
+    properties:
+      user-id:
+        type: integer
+        format: int32
+        example: 38702341
+      answer-id:
+        type: integer
+        format: int32
+        example: 93027422
+      reply-body:
+        type: string
+        maxLength: 2500
+        example: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+
+  get-new-reply-id:
+    description: Reply ID
+    type: integer
+    format: int32
+    example: 93027422
+
+  post-question-vote:
+    type: object
+    properties:
+      user-id:
+        type: integer
+        format: int32
+        example: 38702341
+      vote-type:
+        type: boolean
+        example: false
+
+  post-answer-vote:
+    type: object
+    properties:
+      user-id:
+        type: integer
+        format: int32
+        example: 38702341
+      vote-type:
+        type: boolean
+        example: false
+
+  post-reply-vote:
+    type: object
+    properties:
+      user-id:
+        type: integer
+        format: int32
+        example: 38702341
+      vote-type:
+        type: boolean
+        example: false
+
+  post-city-subscribe-unsubscribe:
+    type: object
+    properties:
+      user-id:
+        type: integer
+        format: int32
+        example: 38702341
+      city-id:
+        type: integer
+        format: int32
+        example: 47983324
+      subscription-type:
+        type: boolean
+        example: true
+
+  post-country-subscribe-unsubscribe:
+    type: object
+    properties:
+      user-id:
+        type: integer
+        format: int32
+        example: 38702341
+      country-id:
+        type: integer
+        format: int32
+        example: 47983324
+      subscription-type:
+        type: boolean
+        example: true

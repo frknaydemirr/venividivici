@@ -25,6 +25,15 @@ tags:
   - name: subscriptions
     description: Operations about subscriptions
 
+securityDefinitions:
+  api-key-header:
+    type: apiKey
+    in: header
+    name: api-key-header
+  login-credentials:
+    type: basic
+    description: Username and password sent in base64
+
 paths:
   /cities/{city-id}:
     get:
@@ -227,6 +236,8 @@ paths:
         - questions
       summary: Post a new question
       description: Posts new question, if success; returns new question ID
+      security:
+        - api-key-header: []
       parameters:
         - name: body
           in: body
@@ -553,6 +564,8 @@ paths:
         - answers
       summary: Post a new answer
       description: Posts new answer
+      security:
+        - api-key-header: []
       parameters:
         - name: body
           in: body
@@ -669,6 +682,8 @@ paths:
         - replies
       summary: Post a new reply
       description: Posts new reply
+      security:
+        - api-key-header: []
       parameters:
         - name: body
           in: body
@@ -688,8 +703,8 @@ paths:
     get:
       tags:
         - replies
-      summary: Get a spesific reply
-      description: Returns a spesific reply
+      summary: Get a specific reply
+      description: Returns a specific reply
       parameters:
         - name: reply-id
           in: path
@@ -708,6 +723,8 @@ paths:
         - replies
       summary: Delete a specific reply
       description: Deletes reply, returns operation code
+      security:
+        - api-key-header: []
       parameters:
         - name: reply-id
           in: path
@@ -803,6 +820,8 @@ paths:
         - votes
       summary: Get user's vote for a specific question
       description: Returns vote type for a specific question
+      security:
+        - api-key-header: []
       parameters:
         - name: question-id
           in: path
@@ -821,6 +840,8 @@ paths:
         - votes
       summary: Vote a specific question
       description: Posts the vote for a specific question, returns status
+      security:
+        - api-key-header: []
       parameters:
         - name: question-id
           in: path
@@ -842,6 +863,8 @@ paths:
       tags:
         - votes
       summary: Delete user's vote for a specific question
+      security:
+        - api-key-header: []
       parameters:
         - name: question-id
           in: path
@@ -860,6 +883,8 @@ paths:
         - votes
       summary: Get user's vote for a specific answer
       description: Returns vote type for a specific answer
+      security:
+        - api-key-header: []
       parameters:
         - name: answer-id
           in: path
@@ -878,6 +903,8 @@ paths:
         - votes
       summary: Vote a specific answer
       description: Posts the answer for a specific answer, returns status
+      security:
+        - api-key-header: []
       parameters:
         - name: answer-id
           in: path
@@ -899,6 +926,8 @@ paths:
       tags:
         - votes
       summary: Delete user's vote for a specific answer
+      security:
+        - api-key-header: []
       parameters:
         - name: answer-id
           in: path
@@ -917,6 +946,8 @@ paths:
         - votes
       summary: Get user's vote for a specific reply
       description: Returns vote type for a specific reply
+      security:
+        - api-key-header: []
       parameters:
         - name: reply-id
           in: path
@@ -935,6 +966,8 @@ paths:
         - votes
       summary: Vote a specific question
       description: Posts the vote for a specific reply, returns status
+      security:
+        - api-key-header: []
       parameters:
         - name: reply-id
           in: path
@@ -956,6 +989,8 @@ paths:
       tags:
         - votes
       summary: Delete user's vote for a specific reply
+      security:
+        - api-key-header: []
       parameters:
         - name: reply-id
           in: path
@@ -976,6 +1011,8 @@ paths:
         - questions
       summary: Get all questions from subscribed cities/countries for a specific user
       description: Returns multiple questions
+      security:
+        - api-key-header: []
       parameters:
         - name: user-id
           in: path
@@ -1007,6 +1044,8 @@ paths:
         - cities
       summary: Get all cities which a specific user is subscribed to.
       description: Returns multiple cities (id+name)
+      security:
+        - api-key-header: []
       parameters:
         - name: user-id
           in: path
@@ -1026,6 +1065,8 @@ paths:
         - users
         - cities
       summary: Subscribe/unsubscribe to a city
+      security:
+        - api-key-header: []
       parameters:
         - name: user-id
           in: path
@@ -1052,6 +1093,8 @@ paths:
         - countries
       summary: Get all countries which a specific user is subscribed to.
       description: Returns multiple countries (id+name)
+      security:
+        - api-key-header: []
       parameters:
         - name: user-id
           in: path
@@ -1071,6 +1114,8 @@ paths:
         - users
         - countries
       summary: Subscribe/unsubscribe to a country
+      security:
+        - api-key-header: []
       parameters:
         - name: user-id
           in: path
@@ -1094,6 +1139,8 @@ paths:
       tags:
         - questions
         - users
+      security:
+        - api-key-header: []
       parameters:
         - name: user-id
           in: path
@@ -1124,6 +1171,8 @@ paths:
       tags:
         - answers
         - users
+      security:
+        - api-key-header: []
       parameters:
         - name: user-id
           in: path
@@ -1154,6 +1203,8 @@ paths:
       tags:
         - replies
         - users
+      security:
+        - api-key-header: []
       parameters:
         - name: user-id
           in: path

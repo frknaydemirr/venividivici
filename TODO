@@ -5,11 +5,11 @@ Initial version of the project. Includes API contract, UI designs, DB models and
 [x] UI mockup including all pages  -Doğukan  @2025-10-26
 [x] Decision of tools and frameworks to use  -Büşra,Zeynep,Furkan,Doğukan  @2025-10-16
 [x] DB design (the general one)  -Doğukan,Furkan  @2025-11-01
-[ ] ER model for DB  -Doğukan
-[x] API contract  -Doğukan,Furkan
+[ ] ER model for DB  -Furkan
+[x] API contract  -Doğukan,Furkan  @2025-11-17
     [x] User endpoints (Profile page) (subscriptions tag)  @2025-11-08
     [x] Post Schemas  @2025-11-08
-    [x] Auth restrictions
+    [x] Auth restrictions  @2025-11-17
     [x] Paging  @2025-11-08
     [x] Error messages  @2025-11-08
     [x] Query parameters (Searching filtering)  @2025-11-08

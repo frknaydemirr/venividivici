@@ -22,3 +22,12 @@ Initial version of the project. Includes API contract, UI designs, DB models and
 [ ] Profile management endpoints (update user info, upload pp etc.)
 [ ] Profile page
 [ ] Rate limiting
+
+
+01.12.2025
+[Frontend]
+Start to UI
+- Write the entry page 
+- Firstly, Make Common Part for every page -> Do component Build (For Navbar, Footer...)
+
+

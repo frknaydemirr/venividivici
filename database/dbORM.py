@@ -1,152 +1,148 @@
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Boolean
-from sqlalchemy.orm import relationship
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Boolean, BLOB, Table
+from sqlalchemy.orm import relationship, declarative_base
+from datetime import datetime
 
 Base = declarative_base()
 
-class Country(Base):
-    __tablename__ = 'Countries'
-    Country_id = Column(Integer, primary_key=True)
-    Countryname = Column(String(100), nullable=False)
-    Countryimg = Column(String(255))
-    Countryinfo = Column(String)
+# Many to many relationship tables
 
-    Cities = relationship("City", back_populates="Country")
-    UserSubscriptions = relationship("CountrySubscription", back_populates="Country")
+question_categories = Table('question-categories', Base.metadata,
+    Column('question_id', Integer, ForeignKey('questions.question_id'), primary_key=True),
+    Column('category_id', Integer, ForeignKey('categories.category_id'), primary_key=True)
+)
 
-class City(Base):
-    __tablename__ = 'Cities'
-    City_id = Column(Integer, primary_key=True)
-    Country_id = Column(Integer, ForeignKey('Countries.Country_id'), nullable=False)
-    Cityname = Column(String(100), nullable=False)
-    Cityimg = Column(String(255))
-    Cityinfo = Column(String)
+question_votes = Table('question-votes', Base.metadata,
+    Column('user_id', Integer, ForeignKey('users.user_id'), primary_key=True),
+    Column('question_id', Integer, ForeignKey('questions.question_id'), primary_key=True),
+    Column('vote_type', Boolean, nullable=False)
+)
 
-    Country = relationship("Country", back_populates="Cities")
-    Users = relationship("User", back_populates="City")
-    UserSubscriptions = relationship("CitySubscription", back_populates="City")
+answer_votes = Table('answer-votes', Base.metadata,
+    Column('user_id', Integer, ForeignKey('users.user_id'), primary_key=True),
+    Column('answer_id', Integer, ForeignKey('answers.answer_id'), primary_key=True),
+    Column('vote_type', Boolean, nullable=False)
+)
+
+reply_votes = Table('reply-votes', Base.metadata,
+    Column('user_id', Integer, ForeignKey('users.user_id'), primary_key=True),
+    Column('reply_id', Integer, ForeignKey('replies.reply_id'), primary_key=True),
+    Column('vote_type', Boolean, nullable=False)
+)
+
+city_subscriptions = Table('city-subscriptions', Base.metadata,
+    Column('city_id', Integer, ForeignKey('cities.city_id'), primary_key=True),
+    Column('user_id', Integer, ForeignKey('users.user_id'), primary_key=True)
+)
+
+country_subscriptions = Table('country-subscriptions', Base.metadata,
+    Column('country_id', Integer, ForeignKey('countries.country_id'), primary_key=True),
+    Column('user_id', Integer, ForeignKey('users.user_id'), primary_key=True)
+)
+
+class Countries(Base):
+    __tablename__ = 'countries'
+    country_id = Column(Integer, primary_key=True)
+    country_name = Column(String(256), nullable=False)
+    country_img = Column(BLOB)
+    country_info = Column(String(10000))
+
+    cities = relationship('Cities', back_populates='country')
 
 
+class Cities(Base):
+    __tablename__ = 'cities'
+    city_id = Column(Integer, primary_key=True)
+    city_name = Column(String(256), nullable=False)
+    city_img = Column(BLOB)
+    city_info = Column(String(10000))
 
-class User(Base):
-    __tablename__ = 'Users'
-    User_id = Column(Integer, primary_key=True)
-    UserName = Column(String(50), nullable=False, unique=True)
-    FullName = Column(String(100))
-    EmailAddress = Column(String(100), nullable=False, unique=True)
-    Password_Hash = Column(String(255), nullable=False)
-    Time_Created = Column(DateTime)
-    User_img = Column(String(255))
-    City_id = Column(Integer, ForeignKey('Cities.City_id'))
-
-    City = relationship("City", back_populates="Users")
+    country_id = Column(Integer, ForeignKey('countries.country_id'), nullable=False)
+    country = relationship('Countries', back_populates='cities', uselist=False)
     
-    Questions_Asked = relationship("Question", back_populates="Asker") 
-    Answers_Given = relationship("Answer", back_populates="Responder")
-    Replies_Made = relationship("Reply", back_populates="Replier")
+    users_of_city = relationship('Users', back_populates='city_of_user')
+    questions_of_city = relationship('Questions', back_populates='city_of_question')
+
+    user_subscriptions_of_city = relationship('Users', secondary=city_subscriptions, back_populates='city_subscription_of_users')
+    user_subscriptions_of_country = relationship('Users', secondary=country_subscriptions, back_populates='country_subscription_of_users')
+
+
+class Users(Base):
+    __tablename__ = 'users'
+    user_id = Column(Integer, primary_key=True)
+    username = Column(String(32), nullable=False, unique=True)
+    full_name = Column(String(64))
+    e_mail_addr = Column(String(254), nullable=False, unique=True)
+    time_created = Column(DateTime, default=datetime.utcnow, nullable=False)
+    user_img = Column(BLOB)
+    password_hash = Column(String(128), nullable=False)
     
-    Question_Votes = relationship("QuestionVote", back_populates="User")
-    Answer_Votes = relationship("AnswerVote", back_populates="User")
-    Reply_Votes = relationship("ReplyVote", back_populates="User")
+    city_id = Column(Integer, ForeignKey('cities.city_id'))
+    city_of_user = relationship('Cities', back_populates='users_of_city', uselist=False)
     
-    Country_Subscriptions = relationship("CountrySubscription", back_populates="User")
-    City_Subscriptions = relationship("CitySubscription", back_populates="User")
-
-
-class Category(Base):
-    __tablename__ = 'Categories'
-    Category_id = Column(Integer, primary_key=True)
-    Categoryname = Column(String(100), nullable=False, unique=True)
-    Categoryimg = Column(String(255))
+    questions_of_user = relationship('Questions', back_populates='user_of_question')
+    answers_of_user = relationship('Answers', back_populates='user_of_answer')
+    replies_of_user = relationship('Replies', back_populates='user_of_reply')
     
-    Question_Categories = relationship("QuestionCategory", back_populates="Category")
+    question_votes_of_users = relationship('Questions', secondary=question_votes, back_populates='users_votes_of_question')
+    answer_votes_of_users = relationship('Answers', secondary=answer_votes, back_populates='users_votes_of_answer')
+    reply_votes_of_users = relationship('Replies', secondary=reply_votes, back_populates='users_votes_of_reply')
 
-class Question(Base):
-    __tablename__ = 'Questions'
-    Question_id = Column(Integer, primary_key=True)
-    User_id = Column(Integer, ForeignKey('Users.User_id'), nullable=False) 
-    Question_Title = Column(String(255), nullable=False)
-    Question_Body = Column(String)
-    Time_Created = Column(DateTime)
+    city_subscription_of_users = relationship('Cities', secondary=city_subscriptions, back_populates='user_subscriptions_of_city')
+    country_subscription_of_users = relationship('Countries', secondary=country_subscriptions, back_populates='user_subscriptions_of_country')
 
-    Asker = relationship("User", back_populates="Questions_Asked")
-    Answers = relationship("Answer", back_populates="Question") 
-    Categories = relationship("QuestionCategory", back_populates="Question")
-    Votes = relationship("QuestionVote", back_populates="Question")
 
-class Answer(Base):
-    __tablename__ = 'Answers'
-    Answer_id = Column(Integer, primary_key=True)
-    Question_id = Column(Integer, ForeignKey('Questions.Question_id'), nullable=False)
-    User_id = Column(Integer, ForeignKey('Users.User_id'), nullable=False) 
-    AnswerBody = Column(String)
-    TimeCreated = Column(DateTime)
+class Categories(Base):
+    __tablename__ = 'categories'
+    category_id = Column(Integer, primary_key=True)
+    category_label = Column(String(64), nullable=False, unique=True)
+
+    questions_of_category = relationship('Questions', secondary=question_categories, back_populates='categories_of_question') 
+
+
+class Questions(Base):
+    __tablename__ = 'questions'
+    question_id = Column(Integer, primary_key=True)
+    time_created = Column(DateTime, default=datetime.utcnow, nullable=False)
+    question_title = Column(String(150), nullable=False)
+    question_body = Column(String(5000), nullable=False)
+
+    user_id = Column(Integer, ForeignKey('users.user_id'), nullable=False)
+    user_of_question = relationship('Users', back_populates='questions_of_user', uselist=False)
+
+    city_id = Column(Integer, ForeignKey('cities.city_id'), nullable=False)
+    city_of_question = relationship('Cities', back_populates='questions_of_city', uselist=False)
     
-    Question = relationship("Question", back_populates="Answers")
-    Responder = relationship("User", back_populates="Answers_Given")
-    Replies = relationship("Reply", back_populates="Answer")
-    Votes = relationship("AnswerVote", back_populates="Answer")
+    answers_of_question = relationship('Answers', back_populates='question_of_answer')
+    categories_of_question = relationship('Categories', secondary=question_categories, back_populates='questions_of_category')
+    users_votes_of_question = relationship('Users', secondary=question_votes, back_populates='question_votes_of_users')
 
-class Reply(Base):
-    __tablename__ = 'Replies'
-    Reply_id = Column(Integer, primary_key=True)
-    Answer_id = Column(Integer, ForeignKey('Answers.Answer_id'), nullable=False) 
-    User_id = Column(Integer, ForeignKey('Users.User_id'), nullable=False) 
-    ReplyBody = Column(String)
-    TimeCreated = Column(DateTime)
+
+class Answers(Base):
+    __tablename__ = 'answers'
+    answer_id = Column(Integer, primary_key=True)
+    answer_body = Column(String(5000), nullable=False)
+    time_created = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+    user_id = Column(Integer, ForeignKey('users.user_id'), nullable=False)
+    user_of_answer = relationship('Users', back_populates='answers_of_user', uselist=False)
+
+    question_id = Column(Integer, ForeignKey('questions.question_id'), nullable=False)
+    question_of_answer = relationship('Questions', back_populates='answers_of_question', uselist=False)
     
-    Answer = relationship("Answer", back_populates="Replies")
-    Replier = relationship("User", back_populates="Replies_Made")
-    Votes = relationship("ReplyVote", back_populates="Reply")
-
-
-class QuestionCategory(Base):
-    __tablename__ = 'QuestionCategories'
-    Question_id = Column(Integer, ForeignKey('Questions.Question_id'), primary_key=True)
-    Category_id = Column(Integer, ForeignKey('Categories.Category_id'), primary_key=True)
+    replies_of_answer = relationship('Replies', back_populates='answer_of_reply')
+    users_votes_of_answer = relationship('Users', secondary=answer_votes, back_populates='answer_votes_of_users')
     
-    Question = relationship("Question", back_populates="Categories")
-    Category = relationship("Category", back_populates="Question_Categories")
 
-class CountrySubscription(Base):
-    __tablename__ = 'CountrySubscriptions'
-    User_id = Column(Integer, ForeignKey('Users.User_id'), primary_key=True)
-    Country_id = Column(Integer, ForeignKey('Countries.Country_id'), primary_key=True)
+class Replies(Base):
+    __tablename__ = 'replies'
+    reply_id = Column(Integer, primary_key=True)
+    reply_body = Column(String(2500), nullable=False)
+    time_created = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+    answer_id = Column(Integer, ForeignKey('answers.answer_id'), nullable=False)
+    answer_of_reply = relationship('Answers', back_populates='replies_of_answer', uselist=False)
     
-    User = relationship("User", back_populates="Country_Subscriptions")
-    Country = relationship("Country", back_populates="UserSubscriptions")
-
-class CitySubscription(Base):
-    __tablename__ = 'CitySubscriptions'
-    User_id = Column(Integer, ForeignKey('Users.User_id'), primary_key=True)
-    City_id = Column(Integer, ForeignKey('Cities.City_id'), primary_key=True)
+    user_id = Column(Integer, ForeignKey('users.user_id'), nullable=False)
+    user_of_reply = relationship('Users', back_populates='replies_of_user', uselist=False)
     
-    User = relationship("User", back_populates="City_Subscriptions")
-    City = relationship("City", back_populates="UserSubscriptions")
-
-class QuestionVote(Base):
-    __tablename__ = 'QuestionVotes'
-    User_id = Column(Integer, ForeignKey('Users.User_id'), primary_key=True)
-    Question_id = Column(Integer, ForeignKey('Questions.Question_id'), primary_key=True)
-    Vote_Type = Column(Boolean)
-
-    User = relationship("User", back_populates="Question_Votes")
-    Question = relationship("Question", back_populates="Votes")
-
-class AnswerVote(Base):
-    __tablename__ = 'AnswerVotes'
-    User_id = Column(Integer, ForeignKey('Users.User_id'), primary_key=True)
-    Answer_id = Column(Integer, ForeignKey('Answers.Answer_id'), primary_key=True)
-    Vote_Type = Column(Boolean)
-
-    User = relationship("User", back_populates="Answer_Votes")
-    Answer = relationship("Answer", back_populates="Votes")
-
-class ReplyVote(Base):
-    __tablename__ = 'ReplyVotes'
-    User_id = Column(Integer, ForeignKey('Users.User_id'), primary_key=True)
-    Reply_id = Column(Integer, ForeignKey('Replies.Reply_id'), primary_key=True)
-    Vote_Type = Column(Boolean)
-
-    User = relationship("User", back_populates="Reply_Votes")
-    Reply = relationship("Reply", back_populates="Votes")
+    users_votes_of_reply = relationship('Users', secondary=reply_votes, back_populates='reply_votes_of_users')

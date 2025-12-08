@@ -17,17 +17,22 @@ Initial version of the project. Includes API contract, UI designs, DB models and
 -Şakir
 
 
+# v0.1.0
+
+First actually working version with API, unstyled front-end and database connections. Dockerfile is ready at the release of this version.
+
+[X] Start to UI  -Furkan
+[X] Write the entry page  -Furkan
+[X] Firstly, Make Common Part for every page -> Do component Build (For Navbar, Footer...)  -Furkan
+[ ] ORM layer on top of the database  -Zeynep 
+[ ] Testing research  -Büşra
+[ ] API implementations of endpoints in the contract  -Doğukan
+[ ] Dockerfile creation with frontend, backend and db pods  -Doğukan,Furkan
+[ ] Foreign key constraints (one-to-many etc.) in ORM  -Zeynep
+
+
 # Backlog
 
 [ ] Profile management endpoints (update user info, upload pp etc.)
 [ ] Profile page
 [ ] Rate limiting
-
-
-02.12.2025 -Büşra,Zeynep,Furkan
-[Frontend]
-[X]Start to UI
-[X]Write the entry page 
-[X]Firstly, Make Common Part for every page -> Do component Build (For Navbar, Footer...)
-
-

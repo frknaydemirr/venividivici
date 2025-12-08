@@ -1,7 +1,9 @@
 body {
+
     margin: 0;
     padding: 0;
 }
+
 
 .main-wrapper {
     display: flex; 
@@ -9,34 +11,33 @@ body {
     min-height: 100vh; 
 }
 
+
 .content-wrapper {
     flex-grow: 1; 
 }
 
 
-/* Navbar içeriğini düzenle */
-.navbar .container-fluid {
-    max-width: 100%;
-    padding-left: 15px;
-    padding-right: 15px;
-}
 
-/* Footer'ı tam genişlik ve en alta yapıştır */
+
 app-footer,
 footer.bg-dark {
     width: 100%;
-    margin-top: auto; /* İçerik az olsa bile footer'ı en alta yapıştırır */
+    margin-top: auto; 
+   
 }
 
-/* Footer içeriğini düzenle */
+
 footer .container-fluid {
     max-width: 100%;
     padding-left: 15px;
     padding-right: 15px;
 }
 
-/* Navbar ve Footer'ın genişliğini sıfırla */
-.navbar,
-footer.bg-dark {
-    box-sizing: border-box;
+#navbarSupportedContent {
+
+
+    display: flex;
+
+    justify-content: center;
 }
+

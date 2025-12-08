@@ -84,12 +84,12 @@ paths:
         default:
           description: Unexpected error
 
-  /cities/{city-id}/image:
+  /cities/{city-id}/image_url:
     get:
       tags:
         - cities
-      summary: Get image for a specific city
-      description: Returns image as png
+      summary: Get image url for a specific city
+      description: Returns image url
       produces:
         - image/png
       parameters:
@@ -102,7 +102,11 @@ paths:
         '200':
           description: successful operation
           schema:
-            type: file
+            type: object
+            properties:
+              url:
+                type: string
+                example: "https://upload.wikimedia.org/wikipedia/commons/7/79/Flag_of_Nigeria.svg"      
         default:
           description: Unexpected error
 
@@ -198,8 +202,8 @@ paths:
     get:
       tags:
         - countries
-      summary: Get image (flag) for a specific country
-      description: Returns image (flag) as png
+      summary: Get image (flag) url for a specific country
+      description: Returns image (flag) url
       produces:
         - image/png
       parameters:
@@ -212,7 +216,11 @@ paths:
         '200':
           description: successful operation
           schema:
-            type: file
+            type: object
+            properties:
+              url:
+                type: string
+                example: "https://upload.wikimedia.org/wikipedia/commons/7/79/Flag_of_Nigeria.svg"  
         default:
           description: Unexpected error
 

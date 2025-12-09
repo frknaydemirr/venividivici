@@ -25,7 +25,9 @@ def insert_all_cities(r: Response, session: Session) -> bool:
     json: dict = r.json()
 
     for country_dict in json["data"]:
-        country_query: Query = session.query(Countries).filter(text(f"country_name='{country_dict["country"]}'")).first()
+        country_query: Countries = session.query(Countries) \
+            .filter(Countries.country_name == country_dict["country"]) \
+            .first()
         if country_query:
             for city in country_dict["cities"]:
                 session.add(Cities(city_name=city, country_id=country_query.country_id))

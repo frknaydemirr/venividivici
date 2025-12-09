@@ -2,7 +2,7 @@ swagger: '2.0'
 info:
   title: venividivici
   description: API documentation for venividici web app.
-  version: 0.0.1
+  version: 1.0.0
 tags:
   - name: cities
     description: Info about cities of countries
@@ -54,6 +54,26 @@ paths:
             $ref: '#/definitions/get-city'
         default:
           description: Unexpected error
+  
+  /cities/{city-id}/counts:
+    get:
+      tags:
+        - cities
+      summary: Get question and answer counts for a specific city
+      description: Returns question and answer counts for a specific city
+      parameters:
+        - name: city-id
+          in: path
+          description: City ID
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/get-qa-counts'     
+        default:
+          description: Unexpected error
 
   /cities/by-country/{country-id}:
     get:
@@ -71,7 +91,7 @@ paths:
           in: query
           type: integer
           description: Offset
-        - name: count
+        - name: limit
           in: query
           type: integer
           maximum: 10
@@ -81,52 +101,6 @@ paths:
           description: successful operation
           schema:
             $ref: '#/definitions/get-multiple-cities'
-        default:
-          description: Unexpected error
-
-  /cities/{city-id}/image_url:
-    get:
-      tags:
-        - cities
-      summary: Get image url for a specific city
-      description: Returns image url
-      produces:
-        - image/png
-      parameters:
-        - name: city-id
-          in: path
-          description: City ID
-          required: true
-          type: integer
-      responses:
-        '200':
-          description: successful operation
-          schema:
-            type: object
-            properties:
-              url:
-                type: string
-                example: "https://upload.wikimedia.org/wikipedia/commons/7/79/Flag_of_Nigeria.svg"      
-        default:
-          description: Unexpected error
-
-  /cities/{city-id}/info:
-    get:
-      tags:
-        - cities
-      summary: Get information text for a specific city
-      description: Returns city information
-      parameters:
-        - name: city-id
-          in: path
-          description: City ID
-          required: true
-          type: integer
-      responses:
-        '200':
-          description: successful operation
-          schema:
-            $ref: '#/definitions/get-city-info'
         default:
           description: Unexpected error
 
@@ -158,6 +132,26 @@ paths:
         default:
           description: Unexpected error
 
+  /countries/{country-id}/counts:
+    get:
+      tags:
+        - countries
+      summary: Get question and answer counts for a specific country
+      description: Returns question and answer counts for a specific country
+      parameters:
+        - name: country-id
+          in: path
+          description: Country ID
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/get-qa-counts'     
+        default:
+          description: Unexpected error
+
   /countries/{country-id}:
     get:
       tags:
@@ -175,52 +169,6 @@ paths:
           description: successful operation
           schema:
             $ref: '#/definitions/get-country'
-        default:
-          description: Unexpected error
-
-  /countries/{country-id}/info:
-    get:
-      tags:
-        - countries
-      summary: Get information text for a specific country
-      description: Returns country information
-      parameters:
-        - name: country-id
-          in: path
-          description: Country ID
-          required: true
-          type: integer
-      responses:
-        '200':
-          description: successful operation
-          schema:
-            $ref: '#/definitions/get-country-info'
-        default:
-          description: Unexpected error
-
-  /countries/{country-id}/image:
-    get:
-      tags:
-        - countries
-      summary: Get image (flag) url for a specific country
-      description: Returns image (flag) url
-      produces:
-        - image/png
-      parameters:
-        - name: country-id
-          in: path
-          description: Country ID
-          required: true
-          type: integer
-      responses:
-        '200':
-          description: successful operation
-          schema:
-            type: object
-            properties:
-              url:
-                type: string
-                example: "https://upload.wikimedia.org/wikipedia/commons/7/79/Flag_of_Nigeria.svg"  
         default:
           description: Unexpected error
 
@@ -297,6 +245,26 @@ paths:
         default:
           description: Unexpected error
 
+  /questions/{question-id}/counts:
+    get:
+      tags:
+        - questions
+      summary: Get answer and vote counts for a specific question
+      description: Returns answer and vote counts for a specific question
+      parameters:
+        - name: question-id
+          in: path
+          description: Question ID
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/get-question-counts'     
+        default:
+          description: Unexpected error
+
   /questions/most-answered:
     get:
       parameters:
@@ -337,7 +305,7 @@ paths:
           in: query
           type: integer
           description: Offset
-        - name: count
+        - name: limit
           in: query
           type: integer
           maximum: 10
@@ -366,7 +334,7 @@ paths:
           in: query
           type: integer
           description: Offset
-        - name: count
+        - name: limit
           in: query
           type: integer
           maximum: 10
@@ -386,7 +354,7 @@ paths:
           in: query
           type: integer
           description: Offset
-        - name: count
+        - name: limit
           in: query
           type: integer
           maximum: 10
@@ -419,7 +387,7 @@ paths:
           in: query
           type: integer
           description: Offset
-        - name: count
+        - name: limit
           in: query
           type: integer
           maximum: 10
@@ -448,7 +416,7 @@ paths:
           in: query
           type: integer
           description: Offset
-        - name: count
+        - name: limit
           in: query
           type: integer
           maximum: 10
@@ -478,7 +446,7 @@ paths:
           in: query
           type: integer
           description: Offset
-        - name: count
+        - name: limit
           in: query
           type: integer
           maximum: 10
@@ -508,7 +476,7 @@ paths:
           in: query
           type: integer
           description: Offset
-        - name: count
+        - name: limit
           in: query
           type: integer
           maximum: 10
@@ -538,7 +506,7 @@ paths:
           in: query
           type: integer
           description: Offset
-        - name: count
+        - name: limit
           in: query
           type: integer
           maximum: 10
@@ -625,6 +593,26 @@ paths:
         default:
           description: Unexpected error
 
+  /answers/{answer-id}/counts:
+    get:
+      tags:
+        - answers
+      summary: Get reply and vote counts for a specific answer
+      description: Returns reply and vote counts for a specific answer
+      parameters:
+        - name: answer-id
+          in: path
+          description: Answer ID
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/get-answer-counts'     
+        default:
+          description: Unexpected error
+
   /answers/by-question/{question-id}:
     get:
       tags:
@@ -641,7 +629,7 @@ paths:
           in: query
           type: integer
           description: Offset
-        - name: count
+        - name: limit
           in: query
           type: integer
           maximum: 10
@@ -671,7 +659,7 @@ paths:
           in: query
           type: integer
           description: Offset
-        - name: count
+        - name: limit
           in: query
           type: integer
           maximum: 10
@@ -704,6 +692,26 @@ paths:
           description: successful operation
           schema:
             $ref: '#/definitions/get-new-reply-id'
+        default:
+          description: Unexpected error
+
+  /replies/{reply-id}/counts:
+    get:
+      tags:
+        - replies
+      summary: Get vote counts for a specific reply
+      description: Returns vote counts for a specific reply
+      parameters:
+        - name: reply-id
+          in: path
+          description: Reply ID
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/get-reply-counts'     
         default:
           description: Unexpected error
 
@@ -756,6 +764,26 @@ paths:
           description: successful operation
           schema:
             $ref: '#/definitions/get-all-categories'
+        default:
+          description: Unexpected error
+
+  /categories/{category-id}:
+    get:
+      tags:
+        - categories
+      summary: Get a specific category
+      description: Returns single category's data
+      parameters:
+        - name: category-id
+          in: path
+          description: Category ID
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/get-category'
         default:
           description: Unexpected error
 
@@ -822,7 +850,28 @@ paths:
         default:
           description: Unexpected error
 
-  /votes/questions/{question-id}:
+  /users/{username}/info:
+    get:
+      tags:
+        - users
+      summary: Get info for a specific user
+      description: Returns user info
+      parameters:
+        - name: username
+          in: path
+          description: Username
+          required: true
+          type: string
+          maxLength: 32
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/get-user-info'
+        default:
+          description: Unexpected error
+
+  /votes/questions/{question-id}/{user-id}:
     get:
       tags:
         - votes
@@ -834,6 +883,11 @@ paths:
         - name: question-id
           in: path
           description: Question ID
+          required: true
+          type: integer
+        - name: user-id
+          in: path
+          description: User ID
           required: true
           type: integer
       responses:
@@ -856,12 +910,17 @@ paths:
           description: Question ID
           required: true
           type: integer
+        - name: user-id
+          in: path
+          description: User ID
+          required: true
+          type: integer
         - name: body
           in: body
           description: Vote body
           required: true
           schema:
-            $ref: '#/definitions/post-question-vote'
+            $ref: '#/definitions/post-vote'
       responses:
         '200':
           description: successful operation
@@ -879,13 +938,18 @@ paths:
           description: Question ID
           required: true
           type: integer
+        - name: user-id
+          in: path
+          description: User ID
+          required: true
+          type: integer
       responses:
         '200':
           description: successful operation
         default:
           description: Unexpected error
 
-  /votes/answers/{answer-id}:
+  /votes/answers/{answer-id}/{user-id}:
     get:
       tags:
         - votes
@@ -897,6 +961,11 @@ paths:
         - name: answer-id
           in: path
           description: Answer ID
+          required: true
+          type: integer
+        - name: user-id
+          in: path
+          description: User ID
           required: true
           type: integer
       responses:
@@ -919,12 +988,17 @@ paths:
           description: Answer ID
           required: true
           type: integer
+        - name: user-id
+          in: path
+          description: User ID
+          required: true
+          type: integer
         - name: body
           in: body
           description: Vote body
           required: true
           schema:
-            $ref: '#/definitions/post-answer-vote'
+            $ref: '#/definitions/post-vote'
       responses:
         '200':
           description: successful operation
@@ -942,13 +1016,18 @@ paths:
           description: Answer ID
           required: true
           type: integer
+        - name: user-id
+          in: path
+          description: User ID
+          required: true
+          type: integer
       responses:
         '200':
           description: successful operation
         default:
           description: Unexpected error
 
-  /votes/replies/{reply-id}:
+  /votes/replies/{reply-id}/{user-id}:
     get:
       tags:
         - votes
@@ -960,6 +1039,11 @@ paths:
         - name: reply-id
           in: path
           description: Reply ID
+          required: true
+          type: integer
+        - name: user-id
+          in: path
+          description: User ID
           required: true
           type: integer
       responses:
@@ -982,12 +1066,17 @@ paths:
           description: Reply ID
           required: true
           type: integer
+        - name: user-id
+          in: path
+          description: User ID
+          required: true
+          type: integer
         - name: body
           in: body
           description: Vote body
           required: true
           schema:
-            $ref: '#/definitions/post-reply-vote'
+            $ref: '#/definitions/post-vote'
       responses:
         '200':
           description: successful operation
@@ -1003,6 +1092,11 @@ paths:
         - name: reply-id
           in: path
           description: Reply ID
+          required: true
+          type: integer
+        - name: user-id
+          in: path
+          description: User ID
           required: true
           type: integer
       responses:
@@ -1031,7 +1125,7 @@ paths:
           in: query
           type: integer
           description: Offset
-        - name: count
+        - name: limit
           in: query
           type: integer
           maximum: 10
@@ -1142,24 +1236,22 @@ paths:
         default:
           description: Unexpected error
 
-  /questions/by-user/{user-id}:
+  /questions/by-user/{username}:
     get:
       tags:
         - questions
         - users
-      security:
-        - api-key-header: []
       parameters:
-        - name: user-id
+        - name: username
           in: path
-          description: User ID
+          description: Username
           required: true
-          type: integer
+          type: string
         - name: offset
           in: query
           type: integer
           description: Offset
-        - name: count
+        - name: limit
           in: query
           type: integer
           maximum: 10
@@ -1174,24 +1266,22 @@ paths:
         default:
           description: Unexpected error
 
-  /answers/by-user/{user-id}:
+  /answers/by-user/{username}:
     get:
       tags:
         - answers
         - users
-      security:
-        - api-key-header: []
       parameters:
-        - name: user-id
+        - name: username
           in: path
-          description: User ID
+          description: Username
           required: true
-          type: integer
+          type: string
         - name: offset
           in: query
           type: integer
           description: Offset
-        - name: count
+        - name: limit
           in: query
           type: integer
           maximum: 10
@@ -1206,24 +1296,22 @@ paths:
         default:
           description: Unexpected error
 
-  /replies/by-user/{user-id}:
+  /replies/by-user/{username}:
     get:
       tags:
         - replies
         - users
-      security:
-        - api-key-header: []
       parameters:
-        - name: user-id
+        - name: username
           in: path
-          description: User ID
+          description: Username
           required: true
-          type: integer
+          type: string
         - name: offset
           in: query
           type: integer
           description: Offset
-        - name: count
+        - name: limit
           in: query
           type: integer
           maximum: 10
@@ -1250,14 +1338,24 @@ definitions:
         type: string
         maxLength: 256
         example: "Tallinn"
+      url:
+        type: string
+        example: "https://upload.wikimedia.org/wikipedia/commons/7/79/Flag_of_Nigeria.svg"
+      info:
+        type: string
+        maxLength: 10000
+
+  get-qa-counts:
+    type: object
+    properties:
       question-count:
         type: integer
         format: int32
-        example: 34
+        example: 1234
       answer-count:
         type: integer
         format: int32
-        example: 123
+        example: 5678 
 
   get-multiple-cities:
     type: array
@@ -1278,10 +1376,6 @@ definitions:
           type: string
           maxLength: 256
           example: Istanbul
-
-  get-city-info:
-    type: string
-    maxLength: 10000
 
   get-all-countries:
     type: array
@@ -1308,14 +1402,12 @@ definitions:
         type: string
         maxLength: 256
         example: "Zimbabwe"
-      question-count:
-        type: integer
-        format: int32
-        example: 34
-      answer-count:
-        type: integer
-        format: int32
-        example: 123
+      info:
+        type: string
+        maxLength: 10000
+      url:
+        type: string
+        example: "https://upload.wikimedia.org/wikipedia/commons/7/79/Flag_of_Nigeria.svg"
 
   get-multiple-countries:
     type: array
@@ -1324,8 +1416,11 @@ definitions:
     maxItems: 10
 
   get-country-info:
-    type: string
-    maxLength: 10000
+    type: object
+    properties:
+      info:
+        type: string
+        maxLength: 10000
 
   get-question:
     type: object
@@ -1342,103 +1437,43 @@ definitions:
         type: string
         maxLength: 5000
         example: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-      user-id:
-        type: integer
-        format: int32
-        example: 38702341
       username:
         type: string
         maxLength: 32
-        example: mad_dogo_69
+        example: "john_doe"
       creation-time:
         type: string
         format: date-time
         example: "2017-07-21T17:32:28Z"
-      vote-count:
-        type: integer
-        example: -23
-      answer-count:
-        type: integer
-        example: 120
-      categories:
+      category-ids:
         type: array
         items:
-          $ref: '#/definitions/get-category'
+          type: integer
+          format: int32
+          example: 82832332
       city-id:
         type: integer
         format: int32
         example: 47983324
-      city-name:
-        type: string
-        maxLength: 256
-        example: "Tallinn"
       country-id:
         type: integer
         format: int32
         example: 47324988
-      country-name:
-        type: string
-        maxLength: 256
-        example: "Estonia"
 
-  get-question-short:
+  get-question-counts:
     type: object
     properties:
-      question-id:
-        type: integer
-        format: int32
-        example: 85307412
-      question-title:
-        type: string
-        maxLength: 75
-        example: "Some example question title?"
-      question-body:
-        type: string
-        maxLength: 200
-        example: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-      user-id:
-        type: integer
-        format: int32
-        example: 38702341
-      username:
-        type: string
-        maxLength: 32
-        example: mad_dogo_69
-      creation-time:
-        type: string
-        format: date-time
-        example: "2017-07-21T17:32:28Z"
-      vote-count:
-        type: integer
-        example: -23
       answer-count:
         type: integer
         example: 120
-      categories:
-        type: array
-        items:
-          $ref: '#/definitions/get-category'
-      city-id:
+      vote-count:
         type: integer
-        format: int32
-        example: 47983324
-      city-name:
-        type: string
-        maxLength: 256
-        example: "Tallinn"
-      country-id:
-        type: integer
-        format: int32
-        example: 47324988
-      country-name:
-        type: string
-        maxLength: 256
-        example: "Estonia"
+        example: -23
 
   get-multiple-questions:
     type: array
     items:
-      $ref: '#/definitions/get-question-short'
+      $ref: '#/definitions/get-question'
     maxItems: 10
 
   get-answer:
@@ -1452,20 +1487,10 @@ definitions:
         type: integer
         format: int32
         example: 93027422
-      user-id:
-        type: integer
-        format: int32
-        example: 38702341
       username:
         type: string
         maxLength: 32
-        example: mad_dogo_69
-      vote-count:
-        type: integer
-        example: 55
-      reply-count:
-        type: integer
-        example: 120
+        example: "john_doe"
       answer-body:
         type: string
         maxLength: 2500
@@ -1474,6 +1499,16 @@ definitions:
         type: string
         format: date-time
         example: "2017-07-21T17:32:28Z"
+
+  get-answer-counts:
+    type: object
+    properties:
+      reply-count:
+        type: integer
+        example: 45
+      vote-count:
+        type: integer
+        example: 12
 
   get-multiple-answers:
     type: array
@@ -1492,17 +1527,10 @@ definitions:
         type: integer
         format: int32
         example: 93027422
-      user-id:
-        type: integer
-        format: int32
-        example: 38702341
       username:
         type: string
         maxLength: 32
-        example: mad_dogo_69
-      vote-count:
-        type: integer
-        example: 55
+        example: "john_doe"
       reply-body:
         type: string
         maxLength: 2500
@@ -1511,6 +1539,13 @@ definitions:
         type: string
         format: date-time
         example: "2017-07-21T17:32:28Z"
+
+  get-reply-counts:
+    type: object
+    properties:
+      vote-count:
+        type: integer
+        example: 7
 
   get-multiple-replies:
     type: array
@@ -1652,10 +1687,12 @@ definitions:
 
   get-new-answer-id:
     description: Answer ID
-    type: integer
-    format: int32
-    example: 93027422
-
+    type: object
+    properties: 
+      answer-id:
+        type: integer
+        example: 93027422 
+      
   post-new-reply:
     type: object
     properties:
@@ -1673,40 +1710,15 @@ definitions:
         example: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
 
   get-new-reply-id:
-    description: Reply ID
-    type: integer
-    format: int32
-    example: 93027422
+    type: object
+    properties: 
+      reply-id:
+        type: integer
+        example: 93027422
 
-  post-question-vote:
+  post-vote:
     type: object
     properties:
-      user-id:
-        type: integer
-        format: int32
-        example: 38702341
-      vote-type:
-        type: boolean
-        example: false
-
-  post-answer-vote:
-    type: object
-    properties:
-      user-id:
-        type: integer
-        format: int32
-        example: 38702341
-      vote-type:
-        type: boolean
-        example: false
-
-  post-reply-vote:
-    type: object
-    properties:
-      user-id:
-        type: integer
-        format: int32
-        example: 38702341
       vote-type:
         type: boolean
         example: false
@@ -1714,10 +1726,6 @@ definitions:
   post-city-subscribe-unsubscribe:
     type: object
     properties:
-      user-id:
-        type: integer
-        format: int32
-        example: 38702341
       city-id:
         type: integer
         format: int32
@@ -1729,10 +1737,6 @@ definitions:
   post-country-subscribe-unsubscribe:
     type: object
     properties:
-      user-id:
-        type: integer
-        format: int32
-        example: 38702341
       country-id:
         type: integer
         format: int32
@@ -1740,3 +1744,18 @@ definitions:
       subscription-type:
         type: boolean
         example: true
+
+  get-user-info:
+    type: object
+    properties:
+      username:
+        type: string
+        maxLength: 32
+        example: "john_doe"
+      creation-time:
+        type: string
+        format: date-time
+        example: "2020-05-15T10:20:30Z"
+      home-city-id:
+        type: integer
+        example: 47983324

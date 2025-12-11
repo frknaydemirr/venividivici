@@ -1,6 +1,5 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import Session, sessionmaker, Query
-from server.database.definitions import *
+from sqlalchemy.orm import Session, Query
+from .definitions import *
 from sqlalchemy import func
 
 from datetime import datetime
@@ -161,15 +160,16 @@ class Converter:
 
 
 class Database:
-    def __init__(self, database_server_url: str):
-        self.__engine = create_engine(database_server_url)
-        self.__Session = sessionmaker(bind=self.__engine)
-        self.__session = self.__Session()
+    def __init__(self, session: Session):
+        self.__session = session
 
     def get_specific_city(self, city_id: int) -> dict:
         city = self.__session.query(*Converter.question_query_fields)\
             .filter(Cities.city_id == city_id).first()
         
+        if not city:
+            return {}
+
         return {
             "city-id": city.city_id,
             "city-name": city.city_name,
@@ -189,21 +189,27 @@ class Database:
             .join(Questions, Answers.question_id == Questions.question_id) \
             .filter(Questions.city_id == city_id).scalar()
 
+        if question_count or answer_count is None:
+            return {}
+
         return {
             "question-count": question_count,
             "answer-count": answer_count
         }
 
-    def get_cities_in_specific_country(self, country_id: int, offset: int = 0, limit: int = 10) -> list:
+    def get_cities_in_specific_country(self, country_id: int, offset: int, limit: int) -> list:
         cities = self.__session.query(*Converter.city_query_fields) \
             .filter(Cities.country_id == country_id) \
             .offset(offset) \
             .limit(limit) \
             .all()
+
+        if not cities:
+            return []
         
         return Converter.city_query_to_list(cities)
 
-    def get_most_conquered_cities(self, limit: int = 10) -> list:
+    def get_most_conquered_cities(self, limit: int) -> list:
         cities = self.__session.query(*Converter.city_query_fields) \
             .outerjoin(Questions, Cities.city_id == Questions.city_id) \
             .outerjoin(Answers, Questions.question_id == Answers.question_id) \
@@ -212,9 +218,12 @@ class Database:
             .limit(limit) \
             .all()
 
+        if not cities:
+            return []
+
         return Converter.city_query_to_list(cities)
 
-    def get_cities_matching_query(self, query_string: str, offset: int = 0, limit: int = 10):
+    def get_cities_matching_query(self, query_string: str, offset: int, limit: int) -> list:
         cities = self.__session.query(*Converter.city_query_fields) \
             .filter(Cities.city_name.ilike(f"%{query_string}%")) \
             .offset(offset) \
@@ -251,6 +260,9 @@ class Database:
             Countries.country_id,
             Countries.country_name       
         ).all()
+
+        if not countries:
+            return []
         
         return Converter.country_query_to_list(countries)
 
@@ -268,6 +280,9 @@ class Database:
             .join(Cities, Questions.city_id == Cities.city_id) \
             .filter(Cities.country_id == country_id).scalar()
 
+        if question_count or answer_count is None:
+            return {}
+
         return {
             "question-count": question_count,
             "answer-count": answer_count
@@ -277,6 +292,9 @@ class Database:
         country = self.__session.query(*Converter.country_query_fields)\
             .filter(Countries.country_id == country_id).first()
         
+        if not country:
+            return {}
+
         return {
             "country-id": country.country_id,
             "country-name": country.country_name,
@@ -284,19 +302,22 @@ class Database:
             "info": country.country_info
         }
 
-    def get_most_conquered_countries(self, country_id: int) -> list:
+    def get_most_conquered_countries(self, limit: int) -> list:
         countries = self.__session.query(*Converter.country_query_fields) \
             .outerjoin(Cities, Countries.country_id == Cities.country_id) \
             .outerjoin(Questions, Cities.city_id == Questions.city_id) \
             .outerjoin(Answers, Questions.question_id == Answers.question_id) \
             .group_by(Countries.country_id) \
             .order_by((func.count(Questions.question_id) + func.count(Answers.answer_id)).desc()) \
-            .limit(country_id) \
+            .limit(limit) \
             .all()
+
+        if not countries:
+            return []
 
         return Converter.country_query_to_list(countries)
 
-    def get_countries_matching_query(self, query_string: str, offset: int = 0, limit: int = 10):
+    def get_countries_matching_query(self, query_string: str, offset: int, limit: int):
         countries = self.__session.query(*Converter.country_query_fields) \
             .filter(Countries.country_name.ilike(f"%{query_string}%")) \
             .offset(offset) \
@@ -395,7 +416,7 @@ class Database:
             "vote-count": upvote_count - downvote_count
         }
 
-    def get_most_answered_questions(self, offset: int = 0, limit: int = 10) -> list:
+    def get_most_answered_questions(self, offset: int, limit: int) -> list:
         questions = self.__session.query(*Converter.question_query_fields) \
             .join(Users, Questions.user_id == Users.user_id) \
             .join(Cities, Questions.city_id == Cities.city_id) \
@@ -416,7 +437,7 @@ class Database:
 
         return Converter.categories_query_to_list(categories)
 
-    def get_most_answered_questions_in_city(self, city_id: int, offset: int = 0, limit: int = 10) -> list:
+    def get_most_answered_questions_in_city(self, city_id: int, offset: int, limit: int) -> list:
         questions = self.__session.query(*Converter.question_query_fields) \
             .join(Users, Questions.user_id == Users.user_id) \
             .join(Cities, Questions.city_id == Cities.city_id) \
@@ -430,7 +451,7 @@ class Database:
 
         return Converter.question_query_to_list(questions)
 
-    def get_most_answered_questions_in_country(self, country_id: int, offset: int = 0, limit: int = 10) -> list:
+    def get_most_answered_questions_in_country(self, country_id: int, offset: int, limit: int) -> list:
         questions = self.__session.query(*Converter.question_query_fields) \
             .join(Users, Questions.user_id == Users.user_id) \
             .join(Cities, Questions.city_id == Cities.city_id) \
@@ -444,7 +465,7 @@ class Database:
 
         return Converter.question_query_to_list(questions)
 
-    def get_recent_questions(self, offset: int = 0, limit: int = 10) -> list:
+    def get_recent_questions(self, offset: int, limit: int) -> list:
         questions = self.__session.query(*Converter.question_query_fields) \
             .join(Users, Questions.user_id == Users.user_id) \
             .join(Cities, Questions.city_id == Cities.city_id) \
@@ -455,7 +476,7 @@ class Database:
 
         return Converter.question_query_to_list(questions)
 
-    def get_recent_questions_of_city(self, city_id: int, offset: int = 0, limit: int = 10) -> list:
+    def get_recent_questions_of_city(self, city_id: int, offset: int, limit: int) -> list:
         questions = self.__session.query(*Converter.question_query_fields) \
             .join(Users, Questions.user_id == Users.user_id) \
             .join(Cities, Questions.city_id == Cities.city_id) \
@@ -467,7 +488,7 @@ class Database:
 
         return Converter.question_query_to_list(questions)
 
-    def get_recent_questions_of_country(self, country_id: int, offset: int = 0, limit: int = 10) -> list:
+    def get_recent_questions_of_country(self, country_id: int, offset: int, limit: int) -> list:
         Questions = self.__session.query(*Converter.question_query_fields) \
             .join(Users, Questions.user_id == Users.user_id) \
             .join(Cities, Questions.city_id == Cities.city_id) \
@@ -479,7 +500,7 @@ class Database:
 
         return Converter.question_query_to_list(Questions)
 
-    def get_questions_matching_query(self, query_string: str, offset: int = 0, limit: int = 10) -> list:
+    def get_questions_matching_query(self, query_string: str, offset: int, limit: int) -> list:
         questions = self.__session.query(*Converter.question_query_fields) \
             .join(Users, Questions.user_id == Users.user_id) \
             .join(Cities, Questions.city_id == Cities.city_id) \
@@ -490,7 +511,7 @@ class Database:
 
         return Converter.question_query_to_list(questions)
 
-    def get_questions_from_subscriptions(self, user_id: int, offset: int = 0, limit: int = 10) -> list:
+    def get_questions_from_subscriptions(self, user_id: int, offset: int, limit: int) -> list:
         questions = self.__session.query(*Converter.question_query_fields) \
             .join(Users, Questions.user_id == Users.user_id) \
             .join(Cities, Questions.city_id == Cities.city_id) \
@@ -574,7 +595,7 @@ class Database:
             "vote-count": upvote_count - downvote_count
         }
 
-    def get_answers_of_specific_question(self, question_id: int, offset: int = 0, limit: int = 10) -> list:
+    def get_answers_of_specific_question(self, question_id: int, offset: int, limit: int) -> list:
         answers = self.__session.query(*Converter.answer_query_fields) \
             .join(Users, Answers.user_id == Users.user_id) \
             .filter(Answers.question_id == question_id) \
@@ -634,7 +655,7 @@ class Database:
         self.__session.delete(reply)
         self.__session.commit()
 
-    def get_replies_of_specific_answer(self, answer_id: int, offset: int = 0, limit: int = 10) -> list:
+    def get_replies_of_specific_answer(self, answer_id: int, offset: int, limit: int) -> list:
         replies = self.__session.query(*Converter.reply_query_fields) \
             .join(Users, Replies.user_id == Users.user_id) \
             .filter(Replies.answer_id == answer_id) \
@@ -726,6 +747,33 @@ class Database:
             "username": user.username,
             "creation-time": user.time_created
         }
+
+    def get_user_exists(self, username: str) -> bool:
+        user = self.__session.query(Users.user_id) \
+            .filter(Users.username == username) \
+            .first()
+        
+        return user is not None
+
+    def get_user_password_match(self, username: str, password: str) -> bool:
+        user = self.__session.query(Users.password) \
+            .filter(Users.username == username) \
+            .first()
+        
+        if user:
+            return user.password == password
+        else:
+            return False
+
+    def get_user_id(self, username: str) -> int:
+        user = self.__session.query(Users.user_id) \
+            .filter(Users.username == username) \
+            .first()
+        
+        if user:
+            return user.user_id
+        else:
+            return None
 
     def get_user_vote_for_question(self, user_id: int, question_id: int) -> bool:
         vote = self.__session.query(Question_Votes.vote_type) \

@@ -1,18 +1,15 @@
-from sqlalchemy import create_engine, text
-from sqlalchemy.orm import sessionmaker, Session, Query
-from definitions import Countries, Cities
+from sqlalchemy.orm import Session, Query
+from server.database.definitions import Cities, Countries
 
 import requests
 from requests import Response
 
 class External_API_Helpers:
-    def __init__(self, database_server_url: str):
-        self.__engine = create_engine(database_server_url)
-        self.__Session = sessionmaker(bind=self.__engine)
-        self.__session = self.__Session()
+    def __init__(self, session: Session):
+        self.__session = session
 
     # /countries/flag/images
-    def insert_all_countries(self, session: Session) -> bool:
+    def insert_all_countries(self) -> bool:
         r = requests.get("https://countriesnow.space/api/v0.1/countries/flag/images")
         
         if r.status_code != 200:
@@ -21,11 +18,11 @@ class External_API_Helpers:
         json: dict = r.json()
 
         for country_dict in json["data"]:
-            session.add(Countries(country_name=country_dict["name"], country_img_url=country_dict["flag"]))
+            self.__session.add(Countries(country_name=country_dict["name"], country_img_url=country_dict["flag"]))
 
-        session.commit()
+        self.__session.commit()
 
-    def insert_all_cities(self, session: Session) -> bool:
+    def insert_all_cities(self) -> bool:
         r = requests.get("https://countriesnow.space/api/v0.1/countries")
         
         if r.status_code != 200:
@@ -34,10 +31,10 @@ class External_API_Helpers:
         json: dict = r.json()
 
         for country_dict in json["data"]:
-            country_query: Countries = session.query(Countries) \
+            country_query: Countries = self.__session.query(Countries) \
                 .filter(Countries.country_name == country_dict["country"]) \
                 .first()
             if country_query:
                 for city in country_dict["cities"]:
-                    session.add(Cities(city_name=city, country_id=country_query.country_id))
-                session.commit()
+                    self.__session.add(Cities(city_name=city, country_id=country_query.country_id))
+                self.__session.commit()

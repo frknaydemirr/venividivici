@@ -95,7 +95,7 @@ class Users(Base):
     e_mail_addr = Column(String(254), nullable=False, unique=True)
     time_created = Column(DateTime, default=datetime.utcnow, nullable=False)
     user_img = Column(BLOB)
-    password_hash = Column(String(128), nullable=False)
+    password = Column(String(32), nullable=False)
     
     city_id = Column(Integer, ForeignKey('cities.city_id'))
     city_of_user = relationship('Cities', back_populates='users_of_city')

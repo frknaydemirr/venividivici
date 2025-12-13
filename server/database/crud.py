@@ -1,5 +1,7 @@
+# TODO : Add checks for POST and DELETE helper functions
+
 from sqlalchemy.orm import Session, Query
-from .definitions import *
+from .models import *
 from sqlalchemy import func
 
 from datetime import datetime
@@ -164,7 +166,7 @@ class Database:
         self.__session = session
 
     def get_specific_city(self, city_id: int) -> dict:
-        city = self.__session.query(*Converter.question_query_fields)\
+        city = self.__session.query(*Converter.city_query_fields)\
             .filter(Cities.city_id == city_id).first()
         
         if not city:
@@ -189,7 +191,7 @@ class Database:
             .join(Questions, Answers.question_id == Questions.question_id) \
             .filter(Questions.city_id == city_id).scalar()
 
-        if question_count or answer_count is None:
+        if question_count is None or answer_count is None:
             return {}
 
         return {
@@ -229,7 +231,10 @@ class Database:
             .offset(offset) \
             .limit(limit) \
             .all()
-        
+
+        if not cities:
+            return []
+
         return Converter.city_query_to_list(cities)
 
     def get_subscribed_cities(self, user_id: int) -> list:
@@ -237,12 +242,18 @@ class Database:
             .filter(Users.user_id == user_id) \
             .first()
 
+        if not user:
+            return []
+
         return Converter.city_query_to_list(user.subscribed_cities)
 
     def post_subscribe_city(self, user_id: int, city_id: int, subscription_type: bool):
         user = self.__session.query(Users) \
             .filter(Users.user_id == user_id) \
             .first()
+
+        if not user:
+            return
         
         city = self.__session.query(Cities) \
             .filter(Cities.city_id == city_id) \
@@ -264,7 +275,15 @@ class Database:
         if not countries:
             return []
         
-        return Converter.country_query_to_list(countries)
+        country_list = []
+
+        for country in countries:
+            country_list.append({
+                "country-id": country.country_id,
+                "country-name": country.country_name
+            })
+
+        return country_list
 
     def get_country_question_and_answer_counts(self, country_id: int) -> dict:
         question_count = self.__session.query(
@@ -323,15 +342,23 @@ class Database:
             .offset(offset) \
             .limit(limit) \
             .all()
+
+        if not countries:
+            return []
         
         return Converter.country_query_to_list(countries)
+
 
     def get_subscribed_countries(self, user_id: int) -> list:
         user = self.__session.query(Users) \
             .filter(Users.user_id == user_id) \
             .first()
 
+        if not user:
+            return []
+
         return Converter.country_query_to_list(user.subscribed_countries)
+
 
     def post_subscribe_country(self, user_id: int, country_id: int, subscription_type: bool):
         user = self.__session.query(Users) \
@@ -349,7 +376,15 @@ class Database:
         
         self.__session.commit()
 
-    def post_new_question(self, user_id: int, city_id: int, question_title: str, question_body: str, category_ids: list):
+    def post_new_question(self, user_id: int, city_id: int, question_title: str, question_body: str, category_ids: list) -> int:
+        user_and_city_exists = self.__session.query(Users.user_id, Cities.city_id) \
+            .join(Users, Users.user_id == user_id) \
+            .join(Cities, Cities.city_id == city_id) \
+            .first()
+
+        if not user_and_city_exists:
+            return None
+        
         new_question = Questions(
             user_id=user_id,
             city_id=city_id,
@@ -368,12 +403,25 @@ class Database:
         
         self.__session.commit()
 
+        new_question_id = self.__session.query(Questions.question_id) \
+            .filter(Questions.user_id == user_id) \
+            .filter(Questions.city_id == city_id) \
+            .filter(Questions.question_title == question_title) \
+            .filter(Questions.question_body == question_body) \
+            .first()
+
+        return new_question_id.question_id
+
+
     def get_specific_question(self, question_id: int) -> dict:
         question = self.__session.query(*Converter.question_query_fields) \
             .join(Users, Questions.user_id == Users.user_id) \
             .join(Cities, Questions.city_id == Cities.city_id) \
             .filter(Questions.question_id == question_id) \
             .first()
+
+        if not question:
+            return {}
 
         return {
             "question-id": question.question_id,
@@ -411,6 +459,9 @@ class Database:
             .filter(Question_Votes.question_id == question_id) \
             .filter(Question_Votes.vote_type == False).scalar()
 
+        if answer_count is None or upvote_count is None or downvote_count is None:
+            return {}
+
         return {
             "answer-count": answer_count,
             "vote-count": upvote_count - downvote_count
@@ -427,6 +478,9 @@ class Database:
             .limit(limit) \
             .all()
 
+        if not questions:
+            return []
+
         return Converter.question_query_to_list(questions)
 
     def get_categories_of_question(self, question_id: int) -> list:
@@ -434,6 +488,9 @@ class Database:
             .join(question_categories, Categories.category_id == question_categories.c.category_id) \
             .filter(question_categories.c.question_id == question_id) \
             .all()
+
+        if not categories:
+            return []
 
         return Converter.categories_query_to_list(categories)
 
@@ -449,6 +506,9 @@ class Database:
             .limit(limit) \
             .all()
 
+        if not questions:
+            return []
+
         return Converter.question_query_to_list(questions)
 
     def get_most_answered_questions_in_country(self, country_id: int, offset: int, limit: int) -> list:
@@ -463,6 +523,9 @@ class Database:
             .limit(limit) \
             .all()
 
+        if not questions:
+            return []
+
         return Converter.question_query_to_list(questions)
 
     def get_recent_questions(self, offset: int, limit: int) -> list:
@@ -473,6 +536,9 @@ class Database:
             .offset(offset) \
             .limit(limit) \
             .all()
+
+        if not questions:
+            return []
 
         return Converter.question_query_to_list(questions)
 
@@ -486,6 +552,9 @@ class Database:
             .limit(limit) \
             .all()
 
+        if not questions:
+            return []
+
         return Converter.question_query_to_list(questions)
 
     def get_recent_questions_of_country(self, country_id: int, offset: int, limit: int) -> list:
@@ -498,6 +567,9 @@ class Database:
             .limit(limit) \
             .all()
 
+        if not Questions:
+            return []
+
         return Converter.question_query_to_list(Questions)
 
     def get_questions_matching_query(self, query_string: str, offset: int, limit: int) -> list:
@@ -508,6 +580,9 @@ class Database:
             .offset(offset) \
             .limit(limit) \
             .all()
+
+        if not questions:
+            return []
 
         return Converter.question_query_to_list(questions)
 
@@ -526,21 +601,26 @@ class Database:
             .limit(limit) \
             .all()
 
+        if not questions:
+            return []
+
         return Converter.question_query_to_list(questions)
 
-    def get_questions_of_user(self, user_id: int, offset: 0, limit: 10) -> list:
+    def get_questions_of_user(self, username: str, offset: 0, limit: 10) -> list:
         questions = self.__session.query(*Converter.question_query_fields) \
             .join(Users, Questions.user_id == Users.user_id) \
-            .join(Cities, Questions.city_id == Cities.city_id) \
-            .filter(Questions.user_id == user_id) \
+            .filter(Users.username == username) \
             .order_by(Questions.time_created.desc()) \
             .offset(offset) \
             .limit(limit) \
             .all()
 
+        if not questions:
+            return []
+
         return Converter.question_query_to_list(questions)
 
-    def post_new_answer(self, user_id: int, question_id: int, answer_body: str):
+    def post_new_answer(self, user_id: int, question_id: int, answer_body: str) -> int:
         new_answer = Answers(
             user_id=user_id,
             question_id=question_id,
@@ -555,6 +635,9 @@ class Database:
             .join(Users, Answers.user_id == Users.user_id) \
             .filter(Answers.answer_id == answer_id) \
             .first()
+
+        if not answer:
+            return {}
 
         return {
             "answer-id": answer.answer_id,
@@ -590,6 +673,9 @@ class Database:
             .filter(Answer_Votes.answer_id == answer_id) \
             .filter(Answer_Votes.vote_type == False).scalar()
 
+        if reply_count is None or upvote_count is None or downvote_count is None:
+            return {}
+
         return {
             "reply-count": reply_count,
             "vote-count": upvote_count - downvote_count
@@ -604,16 +690,22 @@ class Database:
             .limit(limit) \
             .all()
 
+        if not answers:
+            return []
+
         return Converter.answer_query_to_list(answers)
 
-    def get_answers_of_user(self, user_id: int, offset: 0, limit: 10) -> list:
+    def get_answers_of_user(self, username: str, offset: 0, limit: 10) -> list:
         answers = self.__session.query(*Converter.answer_query_fields) \
             .join(Users, Answers.user_id == Users.user_id) \
-            .filter(Answers.user_id == user_id) \
+            .filter(Users.username == username) \
             .order_by(Answers.time_created.desc()) \
             .offset(offset) \
             .limit(limit) \
             .all()
+        
+        if not answers:
+            return []
 
         return Converter.answer_query_to_list(answers)
 
@@ -628,6 +720,9 @@ class Database:
             .join(Users, Replies.user_id == Users.user_id) \
             .filter(Replies.reply_id == reply_id) \
             .first()
+
+        if not reply:
+            return {}
 
         return {
             "reply-id": reply.reply_id,
@@ -664,16 +759,22 @@ class Database:
             .limit(limit) \
             .all()
 
+        if not replies:
+            return []
+
         return Converter.reply_query_to_list(replies)
 
-    def get_replies_of_user(self, user_id: int, offset: 0, limit: 10) -> list:
+    def get_replies_of_user(self, username: str, offset: 0, limit: 10) -> list:
         replies = self.__session.query(*Converter.reply_query_fields) \
             .join(Users, Replies.user_id == Users.user_id) \
-            .filter(Replies.user_id == user_id) \
+            .filter(Users.username == username) \
             .order_by(Replies.time_created.desc()) \
             .offset(offset) \
             .limit(limit) \
             .all()
+
+        if not replies:
+            return []
 
         return Converter.reply_query_to_list(replies)
 
@@ -690,6 +791,9 @@ class Database:
             .filter(Reply_Votes.reply_id == reply_id) \
             .filter(Reply_Votes.vote_type == False).scalar()
 
+        if upvote_count is None or downvote_count is None:
+            return {}
+
         return {
             "vote-count": upvote_count - downvote_count
         }
@@ -698,12 +802,18 @@ class Database:
         Categories = self.__session.query(*Converter.categories_query_fields) \
             .all()
 
+        if not Categories:
+            return []
+
         return Converter.categories_query_to_list(Categories)
         
     def get_specific_category(self, category_id: int) -> dict:
         category = self.__session.query(*Converter.categories_query_fields) \
             .filter(Categories.category_id == category_id) \
             .first()
+
+        if not category:
+            return {}
 
         return {
             "category-id": category.category_id,
@@ -719,6 +829,9 @@ class Database:
             .group_by(Categories.category_id) \
             .all()
 
+        if not categories:
+            return []
+
         return Converter.categories_with_stats_query_to_list(categories)    
 
     def get_all_categories_of_country_with_stats(self, country_id: int) -> list:
@@ -731,6 +844,9 @@ class Database:
             .group_by(Categories.category_id) \
             .all()
 
+        if not categories:
+            return []
+
         return Converter.categories_with_stats_query_to_list(categories)
 
     def get_user_info(self, user_id: int) -> dict:
@@ -741,6 +857,9 @@ class Database:
         ) \
             .filter(Users.user_id == user_id) \
             .first()
+
+        if not user:
+            return {}
 
         return {
             "user-id": user.user_id,

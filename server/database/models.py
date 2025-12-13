@@ -5,7 +5,6 @@ from datetime import datetime
 
 Base = declarative_base()
 
-
 # Many to many relationship tables
 
 class Question_Categories(Base):
@@ -117,7 +116,7 @@ class Categories(Base):
     category_id = Column(Integer, primary_key=True, autoincrement=True)
     category_label = Column(String(64), nullable=False, unique=True)
 
-    questions_of_category = relationship('Questions', secondary='question_categories', backref='categories_of_question')
+    questions_of_category = relationship('Questions', secondary='question_categories', back_populates='categories_of_question')
 
 
 class Questions(Base):
@@ -137,7 +136,7 @@ class Questions(Base):
 
     votes_of_question = relationship('Question_Votes', back_populates='question_of_vote')
 
-    categories_of_question = relationship('Categories', secondary='question_categories', backref='questions_of_category')
+    categories_of_question = relationship('Categories', secondary='question_categories', back_populates='questions_of_category')
 
 
 class Answers(Base):

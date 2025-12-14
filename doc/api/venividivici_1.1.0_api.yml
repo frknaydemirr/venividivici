@@ -2,7 +2,7 @@ swagger: '2.0'
 info:
   title: venividivici
   description: API documentation for venividici web app.
-  version: 1.0.1
+  version: 1.1.0
 tags:
   - name: cities
     description: Info about cities of countries
@@ -106,6 +106,12 @@ paths:
 
   /cities/most-conquered:
     get:
+      parameters:
+        - name: limit
+          in: query
+          type: integer
+          maximum: 10
+          description: No of entries to return
       tags:
         - cities
       summary: Get cities with most questions + answers
@@ -174,6 +180,12 @@ paths:
 
   /countries/most-conquered:
     get:
+      parameters:
+        - name: limit
+          in: query
+          type: integer
+          maximum: 10
+          description: No of entries to return
       tags:
         - countries
       summary: Get countries with most questions + answers
@@ -254,6 +266,8 @@ paths:
         - questions
       summary: Delete a specific question
       description: Deletes question, returns operation code
+      security:
+        - api-key-header: []
       parameters:
         - name: question-id
           in: path
@@ -532,18 +546,6 @@ paths:
           type: integer
           maximum: 10
           description: No of entries to return
-        - name: city-id
-          in: query
-          description: City ID
-          type: integer
-        - name: country-id
-          in: query
-          description: Country ID
-          type: integer
-        - name: category-id
-          in: query
-          description: Category ID
-          type: integer
       responses:
         '200':
           description: successful operation
@@ -602,6 +604,8 @@ paths:
         - answers
       summary: Delete a specific answer
       description: Deletes answer, returns operation code
+      security:
+        - api-key-header: []
       parameters:
         - name: answer-id
           in: path
@@ -1610,14 +1614,6 @@ definitions:
   get-question-vote:
     type: object
     properties:
-      user-id:
-        type: integer
-        format: int32
-        example: 38702341
-      question-id:
-        type: integer
-        format: int32
-        example: 93027422
       vote-type:
         type: boolean
         example: false
@@ -1625,14 +1621,6 @@ definitions:
   get-answer-vote:
     type: object
     properties:
-      user-id:
-        type: integer
-        format: int32
-        example: 38702341
-      answer-id:
-        type: integer
-        format: int32
-        example: 93027422
       vote-type:
         type: boolean
         example: false
@@ -1640,14 +1628,6 @@ definitions:
   get-reply-vote:
     type: object
     properties:
-      user-id:
-        type: integer
-        format: int32
-        example: 38702341
-      reply-id:
-        type: integer
-        format: int32
-        example: 93027422
       vote-type:
         type: boolean
         example: false
@@ -1679,10 +1659,12 @@ definitions:
           example: 82832332
 
   get-new-question-id:
-    description: Question ID
-    type: integer
-    format: int32
-    example: 93027422
+    type: object
+    properties:
+      question-id:
+        type: integer
+        format: int32
+        example: 93027422
 
   post-new-answer:
     type: object
@@ -1771,6 +1753,6 @@ definitions:
         type: string
         format: date-time
         example: "2020-05-15T10:20:30Z"
-      home-city-id:
+      city-id:
         type: integer
         example: 47983324

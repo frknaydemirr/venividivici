@@ -1,3 +1,5 @@
+# TODO: Add cascade deletes
+
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Boolean, BLOB, Table
 from sqlalchemy import create_engine
 from sqlalchemy.orm import relationship, declarative_base

@@ -266,6 +266,7 @@ class Database:
         
         self.__session.commit()
 
+
     def get_all_countries(self) -> list:
         countries = self.__session.query(
             Countries.country_id,
@@ -299,7 +300,7 @@ class Database:
             .join(Cities, Questions.city_id == Cities.city_id) \
             .filter(Cities.country_id == country_id).scalar()
 
-        if question_count or answer_count is None:
+        if question_count is None or answer_count is None:
             return {}
 
         return {
@@ -379,8 +380,7 @@ class Database:
     def post_new_question(self, user_id: int, city_id: int, question_title: str, question_body: str, category_ids: list) -> int:
         user_and_city_exists = self.__session.query(Users.user_id, Cities.city_id) \
             .join(Users, Users.user_id == user_id) \
-            .join(Cities, Cities.city_id == city_id) \
-            .first()
+            .join(Cities, Cities.city_id == city_id)
 
         if not user_and_city_exists:
             return None
@@ -427,7 +427,7 @@ class Database:
             "question-id": question.question_id,
             "question-title": question.question_title,
             "question-body": question.question_body,
-            "asked-by": question.username,
+            "username": question.username,
             "creation-time": question.time_created,
             "city-id": question.city_id,
             "country-id": question.country_id
@@ -448,13 +448,13 @@ class Database:
             .filter(Answers.question_id == question_id).scalar()
 
         upvote_count = self.__session.query(
-            func.count(Question_Votes.vote_id)
+            func.count(Question_Votes.vote_type)
         )\
             .filter(Question_Votes.question_id == question_id) \
             .filter(Question_Votes.vote_type == True).scalar()
 
         downvote_count = self.__session.query(
-            func.count(Question_Votes.vote_id)
+            func.count(Question_Votes.vote_type)
         )\
             .filter(Question_Votes.question_id == question_id) \
             .filter(Question_Votes.vote_type == False).scalar()
@@ -485,8 +485,8 @@ class Database:
 
     def get_categories_of_question(self, question_id: int) -> list:
         categories = self.__session.query(*Converter.categories_query_fields) \
-            .join(question_categories, Categories.category_id == question_categories.c.category_id) \
-            .filter(question_categories.c.question_id == question_id) \
+            .join(Question_Categories, Categories.category_id == Question_Categories.category_id) \
+            .filter(Question_Categories.question_id == question_id) \
             .all()
 
         if not categories:
@@ -558,7 +558,7 @@ class Database:
         return Converter.question_query_to_list(questions)
 
     def get_recent_questions_of_country(self, country_id: int, offset: int, limit: int) -> list:
-        Questions = self.__session.query(*Converter.question_query_fields) \
+        questions = self.__session.query(*Converter.question_query_fields) \
             .join(Users, Questions.user_id == Users.user_id) \
             .join(Cities, Questions.city_id == Cities.city_id) \
             .filter(Cities.country_id == country_id) \
@@ -567,10 +567,10 @@ class Database:
             .limit(limit) \
             .all()
 
-        if not Questions:
+        if not questions:
             return []
 
-        return Converter.question_query_to_list(Questions)
+        return Converter.question_query_to_list(questions)
 
     def get_questions_matching_query(self, query_string: str, offset: int, limit: int) -> list:
         questions = self.__session.query(*Converter.question_query_fields) \
@@ -590,11 +590,11 @@ class Database:
         questions = self.__session.query(*Converter.question_query_fields) \
             .join(Users, Questions.user_id == Users.user_id) \
             .join(Cities, Questions.city_id == Cities.city_id) \
-            .join(city_subscriptions, Questions.city_id == city_subscriptions.c.city_id) \
-            .join(country_subscriptions, Cities.country_id == country_subscriptions.c.country_id) \
+            .join(City_Subscriptions, Questions.city_id == City_Subscriptions.city_id) \
+            .join(Country_Subscriptions, Cities.country_id == Country_Subscriptions.country_id) \
             .filter(
-                (city_subscriptions.c.user_id == user_id) |
-                (country_subscriptions.c.user_id == user_id)
+                (City_Subscriptions.user_id == user_id) |
+                (Country_Subscriptions.user_id == user_id)
             ) \
             .order_by(Questions.time_created.desc()) \
             .offset(offset) \
@@ -630,6 +630,14 @@ class Database:
         self.__session.add(new_answer)
         self.__session.commit()
 
+        new_answer = self.__session.query(Answers.answer_id) \
+            .filter(Answers.user_id == user_id) \
+            .filter(Answers.question_id == question_id) \
+            .filter(Answers.answer_body == answer_body) \
+            .first()
+
+        return new_answer.answer_id
+
     def get_specific_answer(self, answer_id: int) -> dict:
         answer = self.__session.query(*Converter.answer_query_fields) \
             .join(Users, Answers.user_id == Users.user_id) \
@@ -642,7 +650,7 @@ class Database:
         return {
             "answer-id": answer.answer_id,
             "answer-body": answer.answer_body,
-            "answered-by": answer.username,
+            "username": answer.username,
             "creation-time": answer.time_created,
             "question-id": answer.question_id
         }
@@ -662,13 +670,13 @@ class Database:
             .filter(Replies.answer_id == answer_id).scalar()
 
         upvote_count = self.__session.query(
-            func.count(Answer_Votes.vote_id)
+            func.count(Answer_Votes.answer_id)
         )\
             .filter(Answer_Votes.answer_id == answer_id) \
             .filter(Answer_Votes.vote_type == True).scalar()
 
         downvote_count = self.__session.query(
-            func.count(Answer_Votes.vote_id)
+            func.count(Answer_Votes.answer_id)
         )\
             .filter(Answer_Votes.answer_id == answer_id) \
             .filter(Answer_Votes.vote_type == False).scalar()
@@ -727,12 +735,12 @@ class Database:
         return {
             "reply-id": reply.reply_id,
             "reply-body": reply.reply_body,
-            "replied-by": reply.username,
+            "username": reply.username,
             "creation-time": reply.time_created,
             "answer-id": reply.answer_id
         }
 
-    def post_new_reply(self, user_id: int, answer_id: int, reply_body: str):
+    def post_new_reply(self, user_id: int, answer_id: int, reply_body: str) -> int:
         new_reply = Replies(
             user_id=user_id,
             answer_id=answer_id,
@@ -741,6 +749,14 @@ class Database:
         )
         self.__session.add(new_reply)
         self.__session.commit()
+
+        new_reply = self.__session.query(Replies.reply_id) \
+            .filter(Replies.user_id == user_id) \
+            .filter(Replies.answer_id == answer_id) \
+            .filter(Replies.reply_body == reply_body) \
+            .first()
+
+        return new_reply.reply_id
 
     def delete_specific_reply(self, reply_id: int):
         reply = self.__session.query(Replies) \
@@ -780,13 +796,13 @@ class Database:
 
     def get_vote_counts_for_specific_reply(self, reply_id: int) -> dict:
         upvote_count = self.__session.query(
-            func.count(Reply_Votes.vote_id)
+            func.count(Reply_Votes.reply_id)
         ) \
             .filter(Reply_Votes.reply_id == reply_id) \
             .filter(Reply_Votes.vote_type == True).scalar()
 
         downvote_count = self.__session.query(
-            func.count(Reply_Votes.vote_id)
+            func.count(Reply_Votes.reply_id)
         ) \
             .filter(Reply_Votes.reply_id == reply_id) \
             .filter(Reply_Votes.vote_type == False).scalar()
@@ -822,8 +838,8 @@ class Database:
 
     def get_all_categories_of_city_with_stats(self, city_id: int) -> list:
         categories = self.__session.query(*Converter.categories_with_stats_fields) \
-            .join(question_categories, Categories.category_id == question_categories.c.category_id) \
-            .join(Questions, question_categories.c.question_id == Questions.question_id) \
+            .join(Question_Categories, Categories.category_id == Question_Categories.category_id) \
+            .join(Questions, Question_Categories.question_id == Questions.question_id) \
             .outerjoin(Answers, Questions.question_id == Answers.question_id) \
             .filter(Questions.city_id == city_id) \
             .group_by(Categories.category_id) \
@@ -836,8 +852,8 @@ class Database:
 
     def get_all_categories_of_country_with_stats(self, country_id: int) -> list:
         categories = self.__session.query(*Converter.categories_with_stats_fields) \
-            .join(question_categories, Categories.category_id == question_categories.c.category_id) \
-            .join(Questions, question_categories.c.question_id == Questions.question_id) \
+            .join(Question_Categories, Categories.category_id == Question_Categories.category_id) \
+            .join(Questions, Question_Categories.question_id == Questions.question_id) \
             .join(Cities, Questions.city_id == Cities.city_id) \
             .outerjoin(Answers, Questions.question_id == Answers.question_id) \
             .filter(Cities.country_id == country_id) \
@@ -849,22 +865,22 @@ class Database:
 
         return Converter.categories_with_stats_query_to_list(categories)
 
-    def get_user_info(self, user_id: int) -> dict:
+    def get_user_info(self, username: int) -> dict:
         user = self.__session.query(
-            Users.user_id,
+            Users.city_id,
             Users.username,
             Users.time_created
         ) \
-            .filter(Users.user_id == user_id) \
+            .filter(Users.username == username) \
             .first()
 
         if not user:
             return {}
 
         return {
-            "user-id": user.user_id,
             "username": user.username,
-            "creation-time": user.time_created
+            "creation-time": user.time_created,
+            "city-id": user.city_id
         }
 
     def get_user_exists(self, username: str) -> bool:
@@ -894,16 +910,16 @@ class Database:
         else:
             return None
 
-    def get_user_vote_for_question(self, user_id: int, question_id: int) -> bool:
+    def get_user_vote_for_question(self, user_id: int, question_id: int) -> dict:
         vote = self.__session.query(Question_Votes.vote_type) \
             .filter(Question_Votes.user_id == user_id) \
             .filter(Question_Votes.question_id == question_id) \
             .first()
         
         if vote:
-            return vote.vote_type
+            return {"vote-type": vote.vote_type}
         else:
-            return None
+            return {}
 
     def post_user_vote_for_question(self, user_id: int, question_id: int, vote_type: bool):
         existing_vote = self.__session.query(Question_Votes) \
@@ -933,16 +949,16 @@ class Database:
             self.__session.delete(existing_vote)
             self.__session.commit()
 
-    def get_user_vote_for_answer(self, user_id: int, answer_id: int) -> bool:
+    def get_user_vote_for_answer(self, user_id: int, answer_id: int) -> dict:
         vote = self.__session.query(Answer_Votes.vote_type) \
             .filter(Answer_Votes.user_id == user_id) \
             .filter(Answer_Votes.answer_id == answer_id) \
             .first()
         
         if vote:
-            return vote.vote_type
+            return {"vote-type": vote.vote_type}
         else:
-            return None
+            return {}
 
     def post_user_vote_for_answer(self, user_id: int, answer_id: int, vote_type: bool):
         existing_vote = self.__session.query(Answer_Votes) \
@@ -972,16 +988,16 @@ class Database:
             self.__session.delete(existing_vote)
             self.__session.commit()
 
-    def get_user_vote_for_reply(self, user_id: int, reply_id: int) -> bool:
+    def get_user_vote_for_reply(self, user_id: int, reply_id: int) -> dict:
         vote = self.__session.query(Reply_Votes.vote_type) \
             .filter(Reply_Votes.user_id == user_id) \
             .filter(Reply_Votes.reply_id == reply_id) \
             .first()
         
         if vote:
-            return vote.vote_type
+            return {"vote-type": vote.vote_type}
         else:
-            return None
+            return {}
 
     def post_user_vote_for_reply(self, user_id: int, reply_id: int, vote_type: bool):
         existing_vote = self.__session.query(Reply_Votes) \

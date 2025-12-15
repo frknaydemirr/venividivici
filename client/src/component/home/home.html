@@ -1,8 +1,3 @@
-
-
-
-
-
 <div class="center-content-wrapper">
     
     <h3 class="text-center">Where To Concuer?</h3>
@@ -12,11 +7,32 @@
     </form>
 
     <h3 class="text-center">Most Concuered Cities</h3>
+    
+    <div class="city-list-container">
+        <div *ngFor="let city of mostConqueredCities" class="city-item">
+            <img [src]="city.url" [alt]="city['city-name']" style="max-width: 100px;">
+            <h4>{{ city['city-name'] }}</h4>
+            </div>
+    </div>
+
+    <button 
+        class="btn btn-outline-primary" 
+        (click)="loadMostConqueredCities()"
+        *ngIf="hasMoreCities">
+        Load More Cities
+    </button>
+    <div *ngIf="!hasMoreCities && mostConqueredCities.length > 0" class="text-center">Tüm şehirler yüklendi.</div>
+    
     <h3 class="text-center">Most Concuered Countries</h3>
 
-    <button class="btn btn-outline-primary">Load More</button>
-
+    <div class="country-list-container">
+        <div *ngFor="let country of mostConqueredCountries" class="country-item">
+            <img [src]="country.url" [alt]="country['country-name']" style="max-width: 100px;">
+            <h4>{{ country['country-name'] }}</h4>
+            </div>
+    </div>
+    
     <h3 class="text-center">Hot Questions</h3>
 
-    <button class="btn btn-outline-primary">Load More</button>
-    </div>
+    <button class="btn btn-outline-primary">Load More Questions</button>
+</div>

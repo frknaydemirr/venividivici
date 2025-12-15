@@ -8,8 +8,7 @@ class External_API_Helpers:
     def __init__(self, session: Session):
         self.__session = session
 
-    # /countries/flag/images
-    def insert_all_countries(self) -> bool:
+    def insert_all_countries(self):
         r = requests.get("https://countriesnow.space/api/v0.1/countries/flag/images")
         
         if r.status_code != 200:
@@ -22,7 +21,7 @@ class External_API_Helpers:
 
         self.__session.commit()
 
-    def insert_all_cities(self) -> bool:
+    def insert_all_cities(self):
         r = requests.get("https://countriesnow.space/api/v0.1/countries")
         
         if r.status_code != 200:

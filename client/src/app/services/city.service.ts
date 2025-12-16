@@ -2,6 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { CityListResponse } from '../../models/city.model';
+import { Question } from '../../models/questions.model';
 
 
 @Injectable({
@@ -24,5 +25,16 @@ export class CityService {
 
 
   }
-  
+
+
+// Şehir sayfasındaki istatistikler için
+getCityCounts(cityId: number): Observable<{ 'question-count': number, 'answer-count': number }> {
+  return this.http.get<any>(`${this.apiUrl}/cities/${cityId}/counts`);
+}
+
+// Şehir bazlı sorular için
+getRecentQuestionsByCity(cityId: number): Observable<Question[]> {
+  return this.http.get<Question[]>(`${this.apiUrl}/questions/recent/by-city/${cityId}`);
+}
+
 }

@@ -1,13 +1,14 @@
 # TODO: Add questions by category endpoints
 # TODO: Add POST and DELETE endpoints
+# TODO: Put upper limit on limit parameters
 
 from sanic import Sanic, text, Request, json, exceptions
 from http import HTTPMethod
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
 
-from database.definitions import *
-from database.helpers import Database 
+from database.models import *
+from database.crud import Database 
 
 import jwt
 
@@ -90,7 +91,6 @@ async def get_cities_in_specific_country(request: Request, country_id: int):
     return json(body=cities)
 
 
-# TODO : Add limit to the Swagger documentation
 @app.get("/cities/most-conquered")
 async def get_most_conquered_cities(request: Request):
     limit = int(request.args.get("limit", 10))
@@ -136,7 +136,6 @@ async def get_country(request: Request, country_id: int):
     return json(body=country)
 
 
-# TODO : Add limit to the Swagger documentation
 @app.get("/countries/most-conquered")
 async def get_most_conquered_countries(request: Request):
     limit = int(request.args.get("limit", 10))
@@ -474,14 +473,14 @@ async def get_user_info(request: Request, user_id: int):
 
 # Votes endpoints
 
-# TODO: Change return JSON in Swagger documentation in all votes GETs
+
 @app.get("/votes/questions/<question_id:int>/<user_id:int>")
 async def get_user_vote_for_question(request: Request, question_id: int, user_id: int):
     check_token(request, user_id)
 
     vote = db.get_user_vote_for_question(user_id=user_id, question_id=question_id)
 
-    return json(body={"vote": vote})
+    return json(body={"vote-type": vote})
 
 
 @app.get("/votes/answers/<answer_id:int>/<user_id:int>")
@@ -490,7 +489,7 @@ async def get_user_vote_for_answer(request: Request, answer_id: int, user_id: in
 
     vote = db.get_user_vote_for_answer(user_id=user_id, answer_id=answer_id)
 
-    return json(body={"vote": vote})
+    return json(body={"vote-type": vote})
 
 
 @app.get("/votes/replies/<reply_id:int>/<user_id:int>")
@@ -499,7 +498,7 @@ async def get_user_vote_for_reply(request: Request, reply_id: int, user_id: int)
 
     vote = db.get_user_vote_for_reply(user_id=user_id, reply_id=reply_id)
 
-    return json(body={"vote": vote})
+    return json(body={"vote-type": vote})
 
 
 

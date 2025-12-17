@@ -15,7 +15,7 @@ def run_query_file(engine, file_path):
 Session = sessionmaker(bind=engine)
 
 Base.metadata.create_all(bind=engine)
-run_query_file(engine, 'test/test_insertions.sql')
+run_query_file(engine, 'test/helpers_test_insertions.sql')
 
 @pytest.fixture(scope='function')
 def db_session():

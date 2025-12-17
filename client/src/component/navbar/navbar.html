@@ -1,46 +1,28 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <a class="navbar-brand" href="#">Navbar</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
+<nav class="navbar navbar-expand-lg navbar-light bg-light w-100">
+    <div class="container-fluid"> <a class="navbar-brand" routerLink="/home">Veni Vidi Vici</a>
+        
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
+            <span class="navbar-toggler-icon"></span>
+        </button>
 
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav mx-auto"> 
-            <li class="nav-item active">
-                <a class="nav-link" href="#">Home </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#">Cities</a>
-            </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#">Countries</a>
-            </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#">Categories</a>
-            </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#">Questions-Answers Page</a>
-            </li>
-            <!-- <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Dropdown
-                </a>
-                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                    <a class="dropdown-item" href="#">Action</a>
-                    <a class="dropdown-item" href="#">Another action</a>
-                    <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="#">Something else here</a>
-                </div>
-            </li> -->
-
-             
-        </ul>
-  
-<li class="nav-item">
-    <a class="nav-link profile-icon-container ms-5" href="#">
-      Login  <i class="fa-solid fa-user fa-2x"></i>
-      
-    </a>
-</li>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mx-auto mb-2 mb-lg-0"> 
+                <li class="nav-item" *ngFor="let menu of menus">
+                    <a class="nav-link" 
+                       [routerLink]="menu.url" 
+                       routerLinkActive="active"
+                       [routerLinkActiveOptions]="{exact: menu.url === '/home'}">
+                       <i [class]="menu.icon"></i> {{ menu.name }}
+                    </a>
+                </li>
+            </ul>
+            
+            <ul class="navbar-nav ms-auto"> <li class="nav-item">
+                    <a class="nav-link profile-icon-container" routerLink="/login">
+                        Login <i class="fa-solid fa-user fa-lg"></i>
+                    </a>
+                </li>
+            </ul>
+        </div>
     </div>
 </nav>

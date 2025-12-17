@@ -1,19 +1,18 @@
 import { Component } from '@angular/core';
-import { Router, RouterLink, RouterOutlet } from '@angular/router';import { Route } from '@angular/router';
+import { RouterLink, RouterLinkActive } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { Menus } from '../../app/menu';
+
 
 @Component({
   selector: 'app-navbar',
-  imports: [RouterOutlet],
+  standalone: true,
+  imports: [CommonModule, RouterLink, RouterLinkActive],
   templateUrl: './navbar.html',
-  styleUrl: './navbar.css',
+  styleUrl: './navbar.css'
 })
 export class Navbar {
+  menus = Menus;
 
-constructor(
-private router:Router
-) {
- }
-
-
-
+  constructor() { }
 }

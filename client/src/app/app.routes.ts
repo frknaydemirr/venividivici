@@ -11,37 +11,33 @@ import { Auth } from './services/auth';
 
 export const routes: Routes = [
     {
-            path:"login",
-            component:Login
+        path: "login",
+        component: Login
     },
-
     {
-        path:"",
-        component:Layouts,
-        canActivateChild : [() => (inject(Auth) as Auth)],
+        path: "",
+        component: Layouts, 
+        canActivateChild: [() => (inject(Auth) as Auth)], // Kullanıcı login değilse çocuk sayfalar yüklenmez
         children: [
-            {
-            path:"",
-            component:Home
-
-            },{
-
-               path:"cities",
-               component: Cities 
+            // localhost:4200 adresini /home'a yönlendirir
+            { path: "", redirectTo: "home", pathMatch: "full" }, 
+            
+            { 
+                path: "home", 
+                component: Home // URL artık localhost:4200/home olacak
             },
             {
-                path:"countries",
+                path: "cities",
+                component: Cities 
+            },
+            {
+                path: "countries",
                 component: Countries
             },
             {
-                path:"questionsoranswers",
+                path: "question-or-answers",
                 component: QuestionOrAnswers
-            },
-
-             
-
+            }
         ]
-        
     }
-
 ];

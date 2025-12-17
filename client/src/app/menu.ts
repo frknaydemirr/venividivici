@@ -1,6 +1,6 @@
-export  class  MenuModel{
-      name: string = "";
-  icon: string | undefined = "";
+export class MenuModel {
+  name: string = "";
+  icon: string = "";
   url: string = "";
   isTitle: boolean = false;
   subMenus: MenuModel[] = [];
@@ -8,40 +8,32 @@ export  class  MenuModel{
 
 export const Menus: MenuModel[] = [
   {
-    name: "Anasayfa",
-    icon: "fa  fa-solid fa-home",
+    name: "Home",
+    icon: "fa fa-solid fa-home",
     url: "/home",
     isTitle: false,
     subMenus: []
   },
-
   {
-    name: "Şehirler",
+    name: "Cities",
     icon: "fa-solid fa-clipboard-list",
     url: "/cities",
     isTitle: false,
     subMenus: []
   },
-
   {
-     name: "Ülkeler",
+    name: "Countries",
     icon: "fa-solid fa-screwdriver-wrench",
     url: "/countries",
     isTitle: false,
     subMenus: []
   },
-    {
-     name: "soruCevaplar",
+  {
+    name: "AnswerOrQuestions",
     icon: "fa-solid fa-screwdriver-wrench",
-    url: "/answersorquestions",
+    url: "/question-or-answers",
     isTitle: false,
     subMenus: []
   },
-      {
-     name: "girişyap",
-    icon: "fa-solid fa-screwdriver-wrench",
-    url: "/login",
-    isTitle: false,
-    subMenus: []
-  }
+
 ];

@@ -1,1 +1,91 @@
-<p>login works!</p>
+<div class="login-container">
+  <div class="login-header">
+    <h1>Welcome</h1>
+    <p>Sign in to your account</p>
+  </div>
+  
+  <form class="login-form" #loginForm="ngForm" (ngSubmit)="onSubmit(loginForm)" novalidate>
+    <div class="form-group">
+      <label for="username">Username</label>
+      <div class="input-with-icon">
+        <i class="fas fa-user"></i>
+        <input 
+          type="text" 
+          id="username" 
+          name="username"
+          [(ngModel)]="username"
+          #usernameInput="ngModel"
+          required
+          minlength="3"
+          maxlength="20"
+          pattern="[a-zA-Z0-9_]+"
+          class="form-control" 
+          placeholder="Enter your username"
+          [ngClass]="{'is-invalid': usernameInput.invalid && (usernameInput.dirty || usernameInput.touched)}">
+      </div>
+      <div class="error-message" *ngIf="usernameInput.invalid && (usernameInput.dirty || usernameInput.touched)">
+        <span *ngIf="usernameInput.errors?.['required']">Username is required</span>
+        <span *ngIf="usernameInput.errors?.['minlength']">Username must be at least 3 characters</span>
+        <span *ngIf="usernameInput.errors?.['maxlength']">Username cannot exceed 20 characters</span>
+        <span *ngIf="usernameInput.errors?.['pattern']">Only letters, numbers and underscores are allowed</span>
+      </div>
+    </div>
+    
+    <div class="form-group">
+      <label for="password">Password</label>
+      <div class="input-with-icon">
+        <i class="fas fa-lock"></i>
+        <input 
+          [type]="showPassword ? 'text' : 'password'" 
+          id="password" 
+          name="password"
+          [(ngModel)]="password"
+          #passwordInput="ngModel"
+          required
+          minlength="6"
+          class="form-control" 
+          placeholder="Enter your password"
+          [ngClass]="{'is-invalid': passwordInput.invalid && (passwordInput.dirty || passwordInput.touched)}">
+        <button type="button" class="password-toggle" (click)="togglePasswordVisibility()">
+          <i class="fas" [ngClass]="showPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
+        </button>
+      </div>
+      <div class="error-message" *ngIf="passwordInput.invalid && (passwordInput.dirty || passwordInput.touched)">
+        <span *ngIf="passwordInput.errors?.['required']">Password is required</span>
+        <span *ngIf="passwordInput.errors?.['minlength']">Password must be at least 6 characters</span>
+      </div>
+    </div>
+    
+    <div class="additional-options">
+      <div class="remember-me">
+        <input type="checkbox" id="remember" [(ngModel)]="rememberMe" name="rememberMe">
+        <label for="remember">Remember me</label>
+      </div>
+      <a href="#" class="forgot-password" (click)="onForgotPassword($event)">Forgot password?</a>
+    </div>
+    
+    <button 
+      type="submit" 
+      class="login-btn" 
+      [disabled]="isLoading || loginForm.invalid">
+      <span *ngIf="!isLoading">Sign In</span>
+      <span *ngIf="isLoading">
+        <i class="fas fa-spinner fa-spin"></i> Signing in...
+      </span>
+    </button>
+    
+    <div class="signup-link">
+      Don't have an account? <a href="#" (click)="onSignup($event)">Sign Up</a>
+    </div>
+    
+    <div *ngIf="errorMessage" class="error-message server-error">
+      <i class="fas fa-exclamation-circle"></i> {{errorMessage}}
+    </div>
+  </form>
+  
+
+  
+  <div class="form-footer">
+    <p>© {{currentYear}} All rights reserved.</p>
+  </div>
+</div>

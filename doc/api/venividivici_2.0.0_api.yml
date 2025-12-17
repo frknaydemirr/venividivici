@@ -2,7 +2,7 @@ swagger: '2.0'
 info:
   title: venividivici
   description: API documentation for venividici web app.
-  version: 1.1.0
+  version: 2.0.0
 tags:
   - name: cities
     description: Info about cities of countries
@@ -30,9 +30,8 @@ securityDefinitions:
     type: apiKey
     in: header
     name: api-key-header
-  login-credentials:
-    type: basic
-    description: Username and password sent in base64
+
+host: "localhost:8000"
 
 paths:
   /cities/{city-id}:
@@ -896,7 +895,7 @@ paths:
         default:
           description: Unexpected error
 
-  /votes/questions/{question-id}/{user-id}:
+  /votes/questions/{question-id}:
     get:
       tags:
         - votes
@@ -908,11 +907,6 @@ paths:
         - name: question-id
           in: path
           description: Question ID
-          required: true
-          type: integer
-        - name: user-id
-          in: path
-          description: User ID
           required: true
           type: integer
       responses:
@@ -933,11 +927,6 @@ paths:
         - name: question-id
           in: path
           description: Question ID
-          required: true
-          type: integer
-        - name: user-id
-          in: path
-          description: User ID
           required: true
           type: integer
         - name: body
@@ -963,18 +952,13 @@ paths:
           description: Question ID
           required: true
           type: integer
-        - name: user-id
-          in: path
-          description: User ID
-          required: true
-          type: integer
       responses:
         '200':
           description: successful operation
         default:
           description: Unexpected error
 
-  /votes/answers/{answer-id}/{user-id}:
+  /votes/answers/{answer-id}:
     get:
       tags:
         - votes
@@ -986,11 +970,6 @@ paths:
         - name: answer-id
           in: path
           description: Answer ID
-          required: true
-          type: integer
-        - name: user-id
-          in: path
-          description: User ID
           required: true
           type: integer
       responses:
@@ -1011,11 +990,6 @@ paths:
         - name: answer-id
           in: path
           description: Answer ID
-          required: true
-          type: integer
-        - name: user-id
-          in: path
-          description: User ID
           required: true
           type: integer
         - name: body
@@ -1041,18 +1015,13 @@ paths:
           description: Answer ID
           required: true
           type: integer
-        - name: user-id
-          in: path
-          description: User ID
-          required: true
-          type: integer
       responses:
         '200':
           description: successful operation
         default:
           description: Unexpected error
 
-  /votes/replies/{reply-id}/{user-id}:
+  /votes/replies/{reply-id}:
     get:
       tags:
         - votes
@@ -1064,11 +1033,6 @@ paths:
         - name: reply-id
           in: path
           description: Reply ID
-          required: true
-          type: integer
-        - name: user-id
-          in: path
-          description: User ID
           required: true
           type: integer
       responses:
@@ -1089,11 +1053,6 @@ paths:
         - name: reply-id
           in: path
           description: Reply ID
-          required: true
-          type: integer
-        - name: user-id
-          in: path
-          description: User ID
           required: true
           type: integer
         - name: body
@@ -1119,18 +1078,13 @@ paths:
           description: Reply ID
           required: true
           type: integer
-        - name: user-id
-          in: path
-          description: User ID
-          required: true
-          type: integer
       responses:
         '200':
           description: successful operation
         default:
           description: Unexpected error
 
-  /subscriptions/questions/{user-id}:
+  /subscriptions/questions:
     get:
       tags:
         - subscriptions
@@ -1141,11 +1095,6 @@ paths:
       security:
         - api-key-header: []
       parameters:
-        - name: user-id
-          in: path
-          description: User ID
-          required: true
-          type: integer
         - name: offset
           in: query
           type: integer
@@ -1163,7 +1112,7 @@ paths:
         default:
           description: Unexpected error
 
-  /subscriptions/cities/{user-id}:
+  /subscriptions/cities:
     get:
       tags:
         - subscriptions
@@ -1173,12 +1122,6 @@ paths:
       description: Returns multiple cities (id+name)
       security:
         - api-key-header: []
-      parameters:
-        - name: user-id
-          in: path
-          description: User ID
-          required: true
-          type: integer
       responses:
         '200':
           description: successful operation
@@ -1195,11 +1138,6 @@ paths:
       security:
         - api-key-header: []
       parameters:
-        - name: user-id
-          in: path
-          description: User ID
-          required: true
-          type: integer
         - name: body
           in: body
           description: Subscription type
@@ -1212,7 +1150,7 @@ paths:
         default:
           description: Unexpected error
 
-  /subscriptions/countries/{user-id}:
+  /subscriptions/countries:
     get:
       tags:
         - subscriptions
@@ -1222,12 +1160,6 @@ paths:
       description: Returns multiple countries (id+name)
       security:
         - api-key-header: []
-      parameters:
-        - name: user-id
-          in: path
-          description: User ID
-          required: true
-          type: integer
       responses:
         '200':
           description: successful operation
@@ -1244,11 +1176,6 @@ paths:
       security:
         - api-key-header: []
       parameters:
-        - name: user-id
-          in: path
-          description: User ID
-          required: true
-          type: integer
         - name: body
           in: body
           description: Subscription type
@@ -1635,10 +1562,6 @@ definitions:
   post-new-question:
     type: object
     properties:
-      user-id:
-        type: integer
-        format: int32
-        example: 38702341
       city-id:
         type: integer
         format: int32
@@ -1669,10 +1592,6 @@ definitions:
   post-new-answer:
     type: object
     properties:
-      user-id:
-        type: integer
-        format: int32
-        example: 38702341
       question-id:
         type: integer
         format: int32
@@ -1693,10 +1612,6 @@ definitions:
   post-new-reply:
     type: object
     properties:
-      user-id:
-        type: integer
-        format: int32
-        example: 38702341
       answer-id:
         type: integer
         format: int32

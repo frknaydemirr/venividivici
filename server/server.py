@@ -1,26 +1,40 @@
 # TODO: Add questions by category endpoints
-# TODO: Add POST and DELETE endpoints
 # TODO: Put upper limit on limit parameters
+# TODO: Add await
 
-from sanic import Sanic, text, Request, json, exceptions
+from sanic import Sanic, text, Request, json, exceptions, file
 from http import HTTPMethod
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
 
 from database.models import *
 from database.crud import Database 
+from database.external_api_helpers import External_API_Helpers
 
 import jwt
 
-database_url: str = "MOCK_DATABASE_URL"
-engine = create_engine(database_url)
-session = Session(engine)
-
-db: Database = Database(session)
+db: Database = None
 app = Sanic(__name__)
 
+# Setup database
+def setup_database(database_url: str):
+    global db
+    engine = create_engine(database_url)
+    session: Session = Session(engine)
+    
+    ext = External_API_Helpers(session)
+
+    Base.metadata.create_all(engine)
+    
+    if ext.check_if_database_is_empty():
+        ext.insert_all_countries()
+        ext.insert_all_cities()
+
+    db = Database(session)
+
+
 # Authentication helper function
-def check_token(request: Request, user_id: int):
+def check_token(request: Request) -> int:
     auth_header = request.headers.get("Authorization")
     if not auth_header or not auth_header.startswith("Bearer "):
         raise exceptions.Unauthorized("Authorization header missing or invalid.")
@@ -33,12 +47,10 @@ def check_token(request: Request, user_id: int):
     except jwt.InvalidTokenError:
         raise exceptions.Unauthorized("Invalid token.")
     
-    if decoded_token.get("user_id") != user_id:
-        raise exceptions.Forbidden("You do not have access to this user's information.")
-    
-    user_query: Users = session.query(Users).filter(Users.user_id == user_id).first()
-    if not user_query:
-        raise exceptions.NotFound()
+    if not db.get_user_exists_by_id(decoded_token.get("user_id")):
+        raise exceptions.Unauthorized("Invalid token.")
+
+    return decoded_token.get("user_id")
 
 
 # Login endpoint to get JWT token
@@ -107,7 +119,7 @@ async def get_most_conquered_cities(request: Request):
 # Countries endpoints
 
 @app.get("/countries")
-async def get_all_categories(request: Request):
+async def get_all_countries(request: Request):
     countries = db.get_all_countries()
 
     if not countries:
@@ -150,6 +162,34 @@ async def get_most_conquered_countries(request: Request):
 
 
 # Questions endpoints
+
+@app.delete("/questions/<question_id:int>")
+async def delete_question(request: Request, question_id: int):
+    user_id = check_token(request)
+
+    question = db.get_specific_question(question_id=question_id)
+    
+    if db.get_user_id(question["username"]) != user_id:
+        raise exceptions.Forbidden("You do not have permission to delete this question.")
+
+    db.delete_specific_question(question_id=question_id)
+
+    return json(body={"status": "SUCCESS"})
+
+
+@app.post("/questions")
+async def post_new_question(request: Request):
+    user_id = check_token(request)
+    
+    new_question_id = db.post_new_question(
+        user_id=user_id,
+        city_id=request.json["city-id"],
+        question_title=request.json["question-title"],
+        question_body=request.json["question-body"],
+        category_ids=request.json["category-ids"]
+    )
+
+    return json(body={"question-id": new_question_id})
 
 @app.get("/questions/<question_id:int>")
 async def get_specific_question(request: Request, question_id: int):
@@ -307,6 +347,33 @@ async def search_questions(request: Request, query: str):
 
 # Answers endpoints
 
+@app.delete("/answers/<answer_id:int>")
+async def delete_answer(request: Request, answer_id: int):
+    user_id = check_token(request)
+
+    answer = db.get_specific_answer(answer_id=answer_id)
+    
+    if db.get_user_id(answer["username"]) != user_id:
+        raise exceptions.Forbidden("You do not have permission to delete this answer.")
+
+    db.delete_specific_answer(answer_id=answer_id)
+
+    return json(body={"status": "SUCCESS"})
+
+
+@app.post("/answers")
+async def post_new_answer(request: Request):
+    user_id = check_token(request)
+    
+    new_answer_id = db.post_new_answer(
+        user_id=user_id,
+        question_id=request.json["question-id"],
+        answer_body=request.json["answer-body"]
+    )
+
+    return json(body={"answer-id": new_answer_id})
+
+
 @app.get("/answers/<answer_id:int>")
 async def get_specific_answer(request: Request, answer_id: int):
     answer = db.get_specific_answer(answer_id=answer_id)
@@ -355,6 +422,33 @@ async def get_answers_by_user(request: Request, username: str):
 
 
 # Replies endpoints
+
+@app.delete("/replies/<reply_id:int>")
+async def delete_reply(request: Request, reply_id: int):
+    user_id = check_token(request)
+
+    reply = db.get_specific_reply(reply_id=reply_id)
+    
+    if db.get_user_id(reply["username"]) != user_id:
+        raise exceptions.Forbidden("You do not have permission to delete this reply.")
+
+    db.delete_specific_reply(reply_id=reply_id)
+
+    return json(body={"status": "SUCCESS"})
+
+
+@app.post("/replies")
+async def post_new_reply(request: Request):
+    user_id = check_token(request)
+    
+    new_reply_id = db.post_new_reply(
+        user_id=user_id,
+        answer_id=request.json["answer-id"],
+        reply_body=request.json["reply-body"]
+    )
+
+    return json(body={"reply-id": new_reply_id})
+
 
 @app.get("/replies/<reply_id:int>")
 async def get_specific_reply(request: Request, reply_id: int):
@@ -414,8 +508,8 @@ async def get_all_categories(request: Request):
 
     return json(body=categories)
 
-
-@app.get("/categories/<question_id:int>")
+# TODO: Add this fix to swagger
+@app.get("/categories/question/<question_id:int>")
 async def get_categories_of_question(request: Request, question_id: int):
     categories = db.get_categories_of_question(question_id=question_id)
 
@@ -458,11 +552,9 @@ async def get_categories_with_stats_in_country(request: Request, country_id: int
 
 # User endpoints
 
-@app.get("/users/<user_id:int>/info")
-async def get_user_info(request: Request, user_id: int):
-    check_token(request, user_id)
-
-    user_info = db.get_user_info(user_id=user_id)
+@app.get("/users/<username:str>/info")
+async def get_user_info(request: Request, username: str):
+    user_info = db.get_user_info(username=username)
 
     if not user_info:
         raise exceptions.NotFound("User not found.")
@@ -473,40 +565,105 @@ async def get_user_info(request: Request, user_id: int):
 
 # Votes endpoints
 
+@app.delete("/votes/questions/<question_id:int>")
+async def delete_user_vote_for_question(request: Request, question_id: int):
+    user_id = check_token(request)
 
-@app.get("/votes/questions/<question_id:int>/<user_id:int>")
-async def get_user_vote_for_question(request: Request, question_id: int, user_id: int):
-    check_token(request, user_id)
+    db.delete_user_vote_for_question(user_id=user_id, question_id=question_id)
+
+    return json(body={"status": "SUCCESS"})
+
+
+@app.get("/votes/questions/<question_id:int>")
+async def get_user_vote_for_question(request: Request, question_id: int):
+    user_id = check_token(request)
 
     vote = db.get_user_vote_for_question(user_id=user_id, question_id=question_id)
 
     return json(body={"vote-type": vote})
 
 
-@app.get("/votes/answers/<answer_id:int>/<user_id:int>")
-async def get_user_vote_for_answer(request: Request, answer_id: int, user_id: int):
-    check_token(request, user_id)
+@app.post("/votes/questions/<question_id:int>")
+async def post_user_vote_for_question(request: Request, question_id: int):
+    user_id = check_token(request)
+
+    vote_type = request.json["vote-type"]
+    if vote_type not in [True, False]:
+        raise exceptions.InvalidUsage("Invalid vote type. Must be upvote or downvote.")
+
+    db.post_user_vote_for_question(user_id=user_id, question_id=question_id, vote_type=vote_type)
+
+    return json(body={"status": "SUCCESS"})
+
+
+@app.delete("/votes/answers/<answer_id:int>")
+async def delete_user_vote_for_answer(request: Request, answer_id: int):
+    user_id = check_token(request)
+
+    db.delete_user_vote_for_answer(user_id=user_id, answer_id=answer_id)
+
+    return json(body={"status": "SUCCESS"})
+
+
+@app.get("/votes/answers/<answer_id:int>")
+async def get_user_vote_for_answer(request: Request, answer_id: int):
+    user_id = check_token(request)
 
     vote = db.get_user_vote_for_answer(user_id=user_id, answer_id=answer_id)
 
     return json(body={"vote-type": vote})
 
 
-@app.get("/votes/replies/<reply_id:int>/<user_id:int>")
-async def get_user_vote_for_reply(request: Request, reply_id: int, user_id: int):
-    check_token(request, user_id)
+@app.post("/votes/answers/<answer_id:int>")
+async def post_user_vote_for_answer(request: Request, answer_id: int):
+    user_id = check_token(request)
+
+    vote_type = request.json["vote-type"]
+    if vote_type not in [True, False]:
+        raise exceptions.InvalidUsage("Invalid vote type. Must be upvote or downvote.")
+
+    db.post_user_vote_for_answer(user_id=user_id, answer_id=answer_id, vote_type=vote_type)
+
+    return json(body={"status": "SUCCESS"})
+
+
+@app.delete("/votes/replies/<reply_id:int>")
+async def delete_user_vote_for_reply(request: Request, reply_id: int):
+    user_id = check_token(request)
+
+    db.delete_user_vote_for_reply(user_id=user_id, reply_id=reply_id)
+
+    return json(body={"status": "SUCCESS"})
+
+
+@app.get("/votes/replies/<reply_id:int>")
+async def get_user_vote_for_reply(request: Request, reply_id: int):
+    user_id = check_token(request, user_id)
 
     vote = db.get_user_vote_for_reply(user_id=user_id, reply_id=reply_id)
 
     return json(body={"vote-type": vote})
 
 
+@app.post("/votes/replies/<reply_id:int>")
+async def post_user_vote_for_reply(request: Request, reply_id: int):
+    user_id = check_token(request)
+
+    vote_type = request.json["vote-type"]
+    if vote_type not in [True, False]:
+        raise exceptions.InvalidUsage("Invalid vote type. Must be upvote or downvote.")
+
+    db.post_user_vote_for_reply(user_id=user_id, reply_id=reply_id, vote_type=vote_type)
+
+    return json(body={"status": "SUCCESS"})
+
+
 
 # Subscriptions endpoints
 
-@app.get("/subscriptions/questions/<user_id:int>")
-async def get_user_questions_from_subscriptions(request: Request, user_id: int):
-    check_token(request, user_id)
+@app.get("/subscriptions/questions")
+async def get_user_questions_from_subscriptions(request: Request):
+    user_id = check_token(request)
 
     offset = int(request.args.get("offset", 0))
     limit = int(request.args.get("limit", 10))
@@ -519,9 +676,9 @@ async def get_user_questions_from_subscriptions(request: Request, user_id: int):
     return json(body=questions)
 
 
-@app.get("/subscriptions/cities/<user_id:int>")
-async def get_user_city_subscriptions(request: Request, user_id: int):
-    check_token(request, user_id)
+@app.get("/subscriptions/cities")
+async def get_user_city_subscriptions(request: Request):
+    user_id = check_token(request)
 
     cities = db.get_subscribed_cities(user_id=user_id)
 
@@ -531,9 +688,23 @@ async def get_user_city_subscriptions(request: Request, user_id: int):
     return json(body=cities)
 
 
-@app.get("/subscriptions/countries/<user_id:int>")
-async def get_user_country_subscriptions(request: Request, user_id: int):
-    check_token(request, user_id)
+@app.post("/subscriptions/cities")
+async def post_user_city_subscription(request: Request):
+    user_id = check_token(request)
+
+    city_id = request.json["city-id"]
+    subscription_type = request.json["subscription-type"]
+    if subscription_type not in [True, False]:
+        raise exceptions.InvalidUsage("Invalid subscription action.")
+
+    db.post_subscribe_city(user_id=user_id, city_id=city_id, subscription_type=subscription_type)
+
+    return json(body={"status": "SUCCESS"})
+
+
+@app.get("/subscriptions/countries")
+async def get_user_country_subscriptions(request: Request):
+    user_id = check_token(request)
 
     countries = db.get_subscribed_countries(user_id=user_id)
 
@@ -541,3 +712,23 @@ async def get_user_country_subscriptions(request: Request, user_id: int):
         raise exceptions.NotFound("No country subscriptions found for the user.")
 
     return json(body=countries)
+
+
+@app.post("/subscriptions/countries")
+async def post_user_country_subscription(request: Request):
+    user_id = check_token(request)
+
+    country_id = request.json["country-id"]
+    subscription_type = request.json["subscription-type"]
+    if subscription_type not in [True, False]:
+        raise exceptions.InvalidUsage("Invalid subscription action.")
+
+    db.post_subscribe_country(user_id=user_id, country_id=country_id, subscription_type=subscription_type)
+
+    return json(body={"status": "SUCCESS"})
+
+
+
+def run(database_url: str):
+    setup_database(database_url)
+    app.run()

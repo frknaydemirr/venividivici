@@ -1,8 +1,7 @@
-# TODO : Check and fix ALL POST helpers
-
 from sqlalchemy.orm import Session, Query
 from .models import *
 from sqlalchemy import func
+from sanic import exceptions
 
 from datetime import datetime
 
@@ -791,7 +790,7 @@ class Database:
 
         return Converter.categories_with_stats_query_to_list(categories)
 
-    def get_user_info(self, username: int) -> dict:
+    def get_user_info(self, username: str) -> dict:
         user = self.__session.query(
             Users.city_id,
             Users.username,
@@ -813,6 +812,14 @@ class Database:
     def get_user_exists(self, username: str) -> bool:
         user = self.__session.query(Users.user_id) \
             .filter(Users.username == username) \
+            .filter(Users.active == True) \
+            .first()
+        
+        return user is not None
+
+    def get_user_exists_by_id(self, user_id: int) -> bool:
+        user = self.__session.query(Users.user_id) \
+            .filter(Users.user_id == user_id) \
             .filter(Users.active == True) \
             .first()
         
@@ -880,7 +887,7 @@ class Database:
 
     ################# DELETE / DEACTIVATE #################
 
-    def delete_specific_question(self, question_id: int) -> bool:
+    def delete_specific_question(self, question_id: int):
         question: Questions = self.__session.query(Questions) \
             .filter(Questions.question_id == question_id) \
             .filter(Questions.active == True) \
@@ -889,7 +896,7 @@ class Database:
         if question:
             question.active = False
         else:
-            return False
+            raise exceptions.NotFound("Question not found")
 
         # Deactivate all votes of the question
         votes_of_question = self.__session.query(Question_Votes) \
@@ -918,11 +925,14 @@ class Database:
         for category in categories_of_question:
             category.active = False
 
-        self.__session.commit()
-        return True
+        try:
+            self.__session.commit()
+        except Exception as e:
+            self.__session.rollback()
+            raise e
 
 
-    def delete_specific_answer(self, answer_id: int) -> bool:
+    def delete_specific_answer(self, answer_id: int):
         answer: Answers = self.__session.query(Answers) \
             .filter(Answers.answer_id == answer_id) \
             .filter(Answers.active == True) \
@@ -931,7 +941,7 @@ class Database:
         if answer:
             answer.active = False
         else:
-            return False
+            raise exceptions.NotFound("Answer not found")
 
         # Deactivate all votes of the answer
         votes_of_answer = self.__session.query(Answer_Votes) \
@@ -951,11 +961,15 @@ class Database:
         for reply in replies_of_answer:
             self.delete_specific_reply(reply.reply_id)
         
-        self.__session.commit()
-        return True
+        try:
+            self.__session.commit()
+        except Exception as e:
+            self.__session.rollback()
+            raise e
+        
 
 
-    def delete_specific_reply(self, reply_id: int) -> bool:
+    def delete_specific_reply(self, reply_id: int):
         reply: Replies = self.__session.query(Replies) \
             .filter(Replies.reply_id == reply_id) \
             .filter(Replies.active == True) \
@@ -964,7 +978,7 @@ class Database:
         if reply:
             reply.active = False
         else:
-            return False
+            raise exceptions.NotFound("Reply not found")
 
         # Deactivate all votes of the reply
         votes_of_reply = self.__session.query(Reply_Votes) \
@@ -975,8 +989,11 @@ class Database:
         for vote in votes_of_reply:
             vote.active = False
 
-        self.__session.commit()
-        return True
+        try:
+            self.__session.commit()
+        except Exception as e:
+            self.__session.rollback()
+            raise e
 
 
     def delete_user_vote_for_question(self, user_id: int, question_id: int):
@@ -988,7 +1005,13 @@ class Database:
         
         if existing_vote:
             self.__session.delete(existing_vote)
-            self.__session.commit()
+            try:
+                self.__session.commit()
+            except Exception as e:
+                self.__session.rollback()
+                raise e
+        else:
+            raise exceptions.NotFound("Vote not found")
 
 
     def delete_user_vote_for_answer(self, user_id: int, answer_id: int):
@@ -1000,7 +1023,13 @@ class Database:
         
         if existing_vote:
             self.__session.delete(existing_vote)
-            self.__session.commit()
+            try:
+                self.__session.commit()
+            except Exception as e:
+                self.__session.rollback()
+                raise e
+        else:
+            raise exceptions.NotFound("Vote not found")
 
 
     def delete_user_vote_for_reply(self, user_id: int, reply_id: int):
@@ -1012,37 +1041,66 @@ class Database:
         
         if existing_vote:
             self.__session.delete(existing_vote)
-            self.__session.commit()
+            try:
+                self.__session.commit()
+            except Exception as e:
+                self.__session.rollback()
+                raise e
+        else:
+            raise exceptions.NotFound("Vote not found")
 
 
 
     ################# POST #################
 
-    def post_subscribe_city(self, user_id: int, city_id: int, subscription_type: bool):
+    def post_subscribe_city(self, user_id: int, city_id: int, subscription_type: bool) -> bool:
         city = self.__session.query(Cities) \
             .filter(Cities.city_id == city_id) \
             .first()
         
+        if not city:
+            raise exceptions.NotFound("City not found")
+
         if subscription_type:
             user.subscribed_cities.append(city)
         else:
             user.subscribed_cities.remove(city)
         
-        self.__session.commit()
+        try:
+            self.__session.commit()
+        except Exception as e:
+            self.__session.rollback()
+            raise e
+
 
     def post_subscribe_country(self, user_id: int, country_id: int, subscription_type: bool):
         country = self.__session.query(Countries) \
             .filter(Countries.country_id == country_id) \
             .first()
         
+        if not country:
+            raise exceptions.NotFound("Country not found")
+
         if subscription_type:
             user.subscribed_countries.append(country)
         else:
             user.subscribed_countries.remove(country)
         
-        self.__session.commit()
+        try:
+            self.__session.commit()
+        except Exception as e:
+            self.__session.rollback()
+            raise e
+
 
     def post_new_question(self, user_id: int, city_id: int, question_title: str, question_body: str, category_ids: list) -> int:
+        city = self.__session.query(Cities) \
+            .filter(Cities.city_id == city_id) \
+            .first()
+        
+        if not city:
+            raise exceptions.NotFound("City not found")
+        
         new_question = Questions(
             user_id=user_id,
             city_id=city_id,
@@ -1051,15 +1109,24 @@ class Database:
             time_created=datetime.utcnow()
         )
         self.__session.add(new_question)
-        self.__session.commit()
+        try:
+            self.__session.commit()
+        except Exception as e:
+            self.__session.rollback()
+            raise e
 
         for category_id in category_ids:
             category = self.__session.query(Categories) \
                 .filter(Categories.category_id == category_id) \
                 .first()
-            new_question.categories_of_question.append(category)
-        
-        self.__session.commit()
+            if category:
+                new_question.categories_of_question.append(category)
+    
+        try:
+            self.__session.commit()
+        except Exception as e:
+            self.__session.rollback()
+            raise e
 
         new_question_id = self.__session.query(Questions.question_id) \
             .filter(Questions.user_id == user_id) \
@@ -1071,6 +1138,13 @@ class Database:
         return new_question_id.question_id
 
     def post_new_answer(self, user_id: int, question_id: int, answer_body: str) -> int:
+        question = self.__session.query(Questions) \
+            .filter(Questions.question_id == question_id) \
+            .first()
+
+        if not question:
+            raise exceptions.NotFound("Question not found")
+        
         new_answer = Answers(
             user_id=user_id,
             question_id=question_id,
@@ -1078,7 +1152,11 @@ class Database:
             time_created=datetime.utcnow()
         )
         self.__session.add(new_answer)
-        self.__session.commit()
+        try:
+            self.__session.commit()
+        except Exception as e:
+            self.__session.rollback()
+            raise e
 
         new_answer = self.__session.query(Answers.answer_id) \
             .filter(Answers.user_id == user_id) \
@@ -1090,6 +1168,13 @@ class Database:
     
     
     def post_new_reply(self, user_id: int, answer_id: int, reply_body: str) -> int:
+        answer = self.__session.query(Answers) \
+            .filter(Answers.answer_id == answer_id) \
+            .first()
+        
+        if not answer:
+            raise exceptions.NotFound("Answer not found")
+
         new_reply = Replies(
             user_id=user_id,
             answer_id=answer_id,
@@ -1097,7 +1182,12 @@ class Database:
             time_created=datetime.utcnow()
         )
         self.__session.add(new_reply)
-        self.__session.commit()
+
+        try:
+            self.__session.commit()
+        except Exception as e:
+            self.__session.rollback()
+            raise e
 
         new_reply = self.__session.query(Replies.reply_id) \
             .filter(Replies.user_id == user_id) \
@@ -1108,12 +1198,19 @@ class Database:
         return new_reply.reply_id
 
 
-    def post_user_vote_for_question(self, user_id: int, question_id: int, vote_type: bool):
+    def post_user_vote_for_question(self, user_id: int, question_id: int, vote_type: bool) -> bool:
+        question = self.__session.query(Questions) \
+            .filter(Questions.question_id == question_id) \
+            .first()
+
+        if not question:
+            raise exceptions.NotFound("Question not found")
+        
         existing_vote = self.__session.query(Question_Votes) \
             .filter(Question_Votes.user_id == user_id) \
             .filter(Question_Votes.question_id == question_id) \
             .first()
-        
+
         if existing_vote:
             existing_vote.vote_type = vote_type
         else:
@@ -1124,9 +1221,20 @@ class Database:
             )
             self.__session.add(new_vote)
         
-        self.__session.commit()
+        try:
+            self.__session.commit()
+        except Exception as e:
+            self.__session.rollback()
+            raise e
 
     def post_user_vote_for_answer(self, user_id: int, answer_id: int, vote_type: bool):
+        answer = self.__session.query(Answers) \
+            .filter(Answers.answer_id == answer_id) \
+            .first()
+
+        if not answer:
+            raise exceptions.NotFound("Answer not found")
+        
         existing_vote = self.__session.query(Answer_Votes) \
             .filter(Answer_Votes.user_id == user_id) \
             .filter(Answer_Votes.answer_id == answer_id) \
@@ -1142,9 +1250,20 @@ class Database:
             )
             self.__session.add(new_vote)
         
-        self.__session.commit()
+        try:
+            self.__session.commit()
+        except Exception as e:
+            self.__session.rollback()
+            raise e
 
     def post_user_vote_for_reply(self, user_id: int, reply_id: int, vote_type: bool):
+        reply = self.__session.query(Replies) \
+            .filter(Replies.reply_id == reply_id) \
+            .first()
+
+        if not reply:
+            raise exceptions.NotFound("Reply not found")
+        
         existing_vote = self.__session.query(Reply_Votes) \
             .filter(Reply_Votes.user_id == user_id) \
             .filter(Reply_Votes.reply_id == reply_id) \
@@ -1160,4 +1279,8 @@ class Database:
             )
             self.__session.add(new_vote)
         
-        self.__session.commit()
+        try:
+            self.__session.commit()
+        except Exception as e:
+            self.__session.rollback()
+            raise e

@@ -1,4 +1,5 @@
 from sanic import Blueprint, Request, exceptions, json
+import jwt
 
 bp = Blueprint("Login", url_prefix="/login")
 

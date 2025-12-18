@@ -1,5 +1,5 @@
 from sanic import Blueprint, Request, exceptions, json
-from common.check_token import check_token
+from server.common.check_token import check_token
 
 bp = Blueprint("Subscriptions", url_prefix="/subscriptions")
 

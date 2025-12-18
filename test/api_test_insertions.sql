@@ -1,0 +1,2 @@
+INSERT INTO users (user_id, username, full_name, e_mail_addr, time_created, password, city_id) VALUES
+(1, 'alice', 'Alice A', 'alice@test.com', '2025-11-20 09:10:00', 'md5_like_hash_aaaaaaaaaaaaaaa', NULL);

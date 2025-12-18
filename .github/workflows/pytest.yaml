@@ -18,6 +18,10 @@ jobs:
           pip install pytest
           pip install -r requirements.txt
 
-      - name: Run tests
+      - name: Run helpers unit tests
         run: |
-          pytest
+          pytest tests/test_db_crud
+
+      - name: Run API unit tests
+        run: |
+          pytest tests/test_sanic_api

@@ -20,8 +20,8 @@ jobs:
 
       - name: Run helpers unit tests
         run: |
-          pytest test_db_crud
+          python -m pytest test/test_db_crud
 
       - name: Run API unit tests
         run: |
-          pytest test_sanic_api
+          python -m pytest test/test_sanic_api

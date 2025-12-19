@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { CityListResponse } from '../../models/city.model';
+import { City, CityListResponse } from '../../models/city.model';
 import { Question } from '../../models/questions.model';
 
 
@@ -24,6 +24,10 @@ export class CityService {
       return this.http.get<CityListResponse>(`${this.apiUrl}/cities/most-conquered`, { params });
 
 
+  }
+//City comes with special Id -> When city cliked for  (detail page)
+  getCityById(CityId:Number):Observable<City>{
+    return this.http.get<City>(`${this.apiUrl}/${CityId}`);
   }
 
 

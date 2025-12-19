@@ -1,15 +1,33 @@
-<!-- <app-blank pageName="Cities" [routes]="['Cities']">
-<app-section sectionTitle="Cities">
+<div class="city-page-container" *ngIf="!isLoading && selectedCity; else loadingTemplate">
+  
+  <div class="city-header d-flex align-items-center mb-4">
+    <img [src]="selectedCity.url" [alt]="selectedCity['city-name']" class="city-main-img mr-4" style="width: 300px; border-radius: 8px;">
+    <div>
+      <h1>{{ selectedCity['city-name'] }}</h1>
+    <p class="text-muted">City ID: {{ selectedCity['city-id'] }}</p>
+  </div>
+  </div>
 
-    <div class="form-group row">
-        <div class="col-9">
-            <button class="btn btn-dark" data-toggle="modal" data-target="#createModal">
-                <i class="fa-solid fa-plus me-1"></i>
-                Şehir Ara</button>
-        </div>
-        <div class="col-3">
-            <input [(ngModel)]="search"    type="search" class="form-control " placeholder="Aranacak değer girin...">
-        </div>
+  <div class="city-info-section mb-5">
+    <h3>City Info</h3>
+    <p class="city-description">
+      {{ selectedCity.info }}
+    </p>
+    <button class="btn btn-link p-0">READ MORE »</button>
+  </div>
+
+  <div class="action-bar d-flex justify-content-between align-items-center mb-4">
+    <div class="search-box flex-grow-1 mr-3">
+      <input type="text" class="form-control" placeholder="Search questions in this city...">
     </div>
-</app-section> -->
-<h1>Cities</h1>
+    <button class="btn btn-outline-dark">Ask a question</button>
+  </div>
+
+</div>
+
+<ng-template #loadingTemplate>
+  <div class="text-center p-5" *ngIf="isLoading">
+    <i class="fas fa-spinner fa-spin fa-3x"></i>
+    <p>Loading City Details...</p>
+  </div>
+</ng-template>

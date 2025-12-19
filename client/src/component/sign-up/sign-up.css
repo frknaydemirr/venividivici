@@ -1,0 +1,157 @@
+/* Ekranın tam ortasında durmasını sağlar */
+:host {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  width: 100%;
+  background-color: #f4f7f9;
+}
+
+.signup-container {
+  width: 100%;
+  max-width: 500px; /* Kayıt formu biraz daha geniş olabilir */
+  background-color: white;
+  border-radius: 16px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  animation: fadeIn 0.5s ease-out;
+  margin: auto;
+}
+
+.signup-header {
+  background: linear-gradient(to right, #4776E6, #8E54E9);
+  color: white;
+  padding: 30px 20px;
+  text-align: center;
+}
+
+.signup-header h1 {
+  font-weight: 600;
+  font-size: 28px;
+  margin-bottom: 8px;
+}
+
+.signup-header p {
+  opacity: 0.9;
+  font-size: 16px;
+}
+
+.signup-form {
+  padding: 30px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #333;
+  font-size: 15px;
+}
+
+.form-control {
+  width: 100%;
+  padding: 12px 15px;
+  border: 2px solid #e1e5ee;
+  border-radius: 10px;
+  font-size: 16px;
+  transition: all 0.3s;
+  background-color: #f8f9fa;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #4776E6;
+  background-color: white;
+  box-shadow: 0 0 0 3px rgba(71, 118, 230, 0.1);
+}
+
+.form-control.is-invalid {
+  border-color: #e74c3c;
+}
+
+.error-message {
+  color: #e74c3c;
+  font-size: 13px;
+  margin-top: 5px;
+  display: block;
+  min-height: 18px;
+}
+
+.server-error {
+  background-color: #fde8e8;
+  padding: 12px;
+  border-radius: 8px;
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-left: 4px solid #e74c3c;
+  color: #e74c3c;
+}
+
+.signup-btn {
+  background: linear-gradient(to right, #4776E6, #8E54E9);
+  color: white;
+  border: none;
+  width: 100%;
+  padding: 16px;
+  border-radius: 10px;
+  font-size: 17px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  margin-top: 15px;
+  letter-spacing: 0.5px;
+}
+
+.signup-btn:hover:not(:disabled) {
+  background: linear-gradient(to right, #3a64d8, #7d48d6);
+  transform: translateY(-2px);
+  box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08);
+}
+
+.signup-btn:disabled {
+  background: #cccccc;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.login-link {
+  text-align: center;
+  margin-top: 25px;
+  color: #666;
+  font-size: 15px;
+}
+
+.login-link a {
+  color: #4776E6;
+  text-decoration: none;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.login-link a:hover {
+  text-decoration: underline;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 480px) {
+  .signup-container {
+    max-width: 100%;
+    border-radius: 0;
+  }
+  
+  .signup-form {
+    padding: 20px;
+  }
+}

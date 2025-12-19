@@ -7,6 +7,7 @@ import { QuestionOrAnswers } from '../component/question-or-answers/question-or-
 import { Login } from '../component/login/login';
 import { inject } from '@angular/core';
 import { Auth } from './services/auth';
+import { SignUp } from '../component/sign-up/sign-up';
 
 
 export const routes: Routes = [
@@ -14,6 +15,11 @@ export const routes: Routes = [
         path: "login",
         component: Login
     },
+    {
+        path: "sign-up", 
+        component: SignUp
+    },
+    
     {
         path: "",
         component: Layouts, 
@@ -37,7 +43,9 @@ export const routes: Routes = [
             {
                 path: "question-or-answers",
                 component: QuestionOrAnswers
-            }
+            },
+            
+
         ]
     }
 ];

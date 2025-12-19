@@ -44,10 +44,11 @@ ngOnInit() : void{
   //cities
 loadMostConqueredCities(): void {
     if (!this.hasMoreCities) return;
-
+//HttpClient Request -> queue
     this.cityService.getMostConqueredCities(this.cityOffset, this.cityLimit)
       .subscribe({
-        next: (newCities: City[]) => {
+        //data come and assign to mostConqueredCities array -> next step next method:
+        next: (newCities: City[]) => { //event handler 
           this.mostConqueredCities = [...this.mostConqueredCities, ...newCities];
           
           if (newCities.length < this.cityLimit) {
@@ -57,6 +58,7 @@ loadMostConqueredCities(): void {
         },
         error: (err) => console.error('Most Conquered Cities yüklenirken hata oluştu:', err)
       });
+      //Notes: Promise has include just one event But Observable has include multiple event -> next, error, complete 
   }
 
 //countries

@@ -1,0 +1,68 @@
+<div class="signup-container">
+  <div class="signup-header">
+    <h1>Create Account</h1>
+    <p>Join the VeniVidiVici community</p>
+  </div>
+
+  <form class="signup-form" #signupForm="ngForm" (ngSubmit)="onSignup(signupForm)" novalidate>
+    <div class="form-group">
+      <label for="fullName">Full Name</label>
+      <input type="text" id="fullName" name="fullName" [(ngModel)]="user.fullName" #fullNameInput="ngModel"
+        required minlength="3" class="form-control" placeholder="Enter your full name"
+        [ngClass]="{'is-invalid': fullNameInput.invalid && (fullNameInput.dirty || fullNameInput.touched)}">
+      <div class="error-message" *ngIf="fullNameInput.invalid && (fullNameInput.dirty || fullNameInput.touched)">
+        <span>Full name is required (min 3 chars)</span>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="username">Username</label>
+      <input type="text" id="username" name="username" [(ngModel)]="user.username" #usernameInput="ngModel"
+        required minlength="3" pattern="[a-zA-Z0-9_]+" class="form-control" placeholder="Choose a username"
+        [ngClass]="{'is-invalid': usernameInput.invalid && (usernameInput.dirty || usernameInput.touched)}">
+      <div class="error-message" *ngIf="usernameInput.invalid && (usernameInput.dirty || usernameInput.touched)">
+        <span>Only letters, numbers and underscores allowed</span>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="email">E-mail Address</label>
+      <input type="email" id="email" name="email" [(ngModel)]="user.email" #emailInput="ngModel"
+        required email class="form-control" placeholder="example@mail.com"
+        [ngClass]="{'is-invalid': emailInput.invalid && (emailInput.dirty || emailInput.touched)}">
+      <div class="error-message" *ngIf="emailInput.invalid && (emailInput.dirty || emailInput.touched)">
+        <span>Please enter a valid e-mail address</span>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" [(ngModel)]="user.password" #passwordInput="ngModel"
+        required minlength="6" class="form-control" placeholder="Create a password"
+        [ngClass]="{'is-invalid': passwordInput.invalid && (passwordInput.dirty || passwordInput.touched)}">
+    </div>
+
+    <div class="form-group">
+      <label for="confirmPassword">Confirm Password</label>
+      <input type="password" id="confirmPassword" name="confirmPassword" [(ngModel)]="confirmPassword" 
+        #confirmInput="ngModel" required class="form-control" placeholder="Repeat your password"
+        [ngClass]="{'is-invalid': (confirmInput.dirty || confirmInput.touched) && user.password !== confirmPassword}">
+      <div class="error-message" *ngIf="(confirmInput.dirty || confirmInput.touched) && user.password !== confirmPassword">
+        <span>Passwords do not match!</span>
+      </div>
+    </div>
+
+    <button type="submit" class="signup-btn" [disabled]="isLoading || signupForm.invalid || user.password !== confirmPassword">
+      <span *ngIf="!isLoading">Register Now</span>
+      <span *ngIf="isLoading"><i class="fas fa-spinner fa-spin"></i> Creating Account...</span>
+    </button>
+
+    <div class="login-link">
+      Already have an account? <a routerLink="/login">Login here</a>
+    </div>
+
+    <div *ngIf="errorMessage" class="error-message server-error">
+      <i class="fas fa-exclamation-circle"></i> {{errorMessage}}
+    </div>
+  </form>
+</div>

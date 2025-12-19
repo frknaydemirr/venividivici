@@ -1057,9 +1057,16 @@ class Database:
         city = self.__session.query(Cities) \
             .filter(Cities.city_id == city_id) \
             .first()
-        
+
         if not city:
             raise exceptions.NotFound("City not found")
+
+        user = self.__session.query(Users) \
+            .filter(Users.user_id == user_id) \
+            .first()
+
+        if not user:
+            raise exceptions.NotFound("User not found")
 
         if subscription_type:
             user.subscribed_cities.append(city)
@@ -1080,6 +1087,13 @@ class Database:
         
         if not country:
             raise exceptions.NotFound("Country not found")
+
+        user = self.__session.query(Users) \
+            .filter(Users.user_id == user_id) \
+            .first()
+
+        if not user:
+            raise exceptions.NotFound("User not found")
 
         if subscription_type:
             user.subscribed_countries.append(country)

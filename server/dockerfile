@@ -1,0 +1,14 @@
+FROM python:3.14.2-slim-trixie
+
+WORKDIR /sanic
+
+ADD server /sanic/server
+COPY requirements.txt .
+
+RUN apt update
+RUN apt install -y pkg-config python3-dev default-libmysqlclient-dev build-essential
+RUN pip install -r requirements.txt
+
+EXPOSE 11111
+
+CMD ["sanic", "server.server:create_app", "--worker=4", "--port=11111", "--host=0.0.0.0"]

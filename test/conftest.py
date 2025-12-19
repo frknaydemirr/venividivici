@@ -1,9 +1,12 @@
 import pytest
+
 from server.database.models import Base
+from server.database.crud import Database
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 
-engine = create_engine('sqlite:///:memory:')
+from sanic import Sanic
+from server.server import create_app
 
 def run_query_file(engine, file_path):
     with engine.begin() as connection:
@@ -12,20 +15,44 @@ def run_query_file(engine, file_path):
             query = text(file.read())
             db_api_connection.executescript(query.text)
 
-Session = sessionmaker(bind=engine)
 
-Base.metadata.create_all(bind=engine)
-run_query_file(engine, 'test/helpers_test_insertions.sql')
+helpers_engine = create_engine('sqlite:///:memory:')
+HelpersSession = sessionmaker(bind=helpers_engine)
+Base.metadata.create_all(bind=helpers_engine)
+run_query_file(helpers_engine, 'test/helpers_test_insertions.sql')
 
 @pytest.fixture(scope='function')
 def db_session():
     # Setup
-    connection = engine.connect()
+    connection = helpers_engine.connect()
     transaction = connection.begin()
 
-    session = Session(bind=connection)
+    session = HelpersSession(bind=connection)
 
     yield session
+
+    # Teardown
+    session.close()
+    transaction.rollback()
+    connection.close()
+
+
+api_engine = create_engine('sqlite:///:memory:')
+APISession = sessionmaker(bind=api_engine)
+Base.metadata.create_all(bind=api_engine)
+run_query_file(api_engine, 'test/api_test_insertions.sql')
+
+@pytest.fixture(scope='session')
+def sanic_instance():
+    # Setup
+    connection = api_engine.connect()
+    transaction = connection.begin()
+
+    session = APISession(bind=connection)
+    
+    app = create_app("venividivici", external_session=session)
+
+    yield app
 
     # Teardown
     session.close()

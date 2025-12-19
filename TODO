@@ -29,6 +29,7 @@ First actually working version with API, unstyled front-end and database connect
 [ ] API implementations of endpoints in the contract  -Doğukan
 [ ] Dockerfile creation with frontend, backend and db pods  -Doğukan,Furkan
 [ ] Foreign key constraints (one-to-many etc.) in ORM  -Zeynep
+[ ] Editing Page Design and Decision Process – Büşra, Furkan, Zeynep
 
 
 # Backlog

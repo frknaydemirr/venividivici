@@ -2,7 +2,7 @@ swagger: '2.0'
 info:
   title: venividivici
   description: API documentation for venividici web app.
-  version: 1.0.1
+  version: 2.0.0
 tags:
   - name: cities
     description: Info about cities of countries
@@ -30,9 +30,8 @@ securityDefinitions:
     type: apiKey
     in: header
     name: api-key-header
-  login-credentials:
-    type: basic
-    description: Username and password sent in base64
+
+host: "localhost:8000"
 
 paths:
   /cities/{city-id}:
@@ -106,6 +105,12 @@ paths:
 
   /cities/most-conquered:
     get:
+      parameters:
+        - name: limit
+          in: query
+          type: integer
+          maximum: 10
+          description: No of entries to return
       tags:
         - cities
       summary: Get cities with most questions + answers
@@ -174,6 +179,12 @@ paths:
 
   /countries/most-conquered:
     get:
+      parameters:
+        - name: limit
+          in: query
+          type: integer
+          maximum: 10
+          description: No of entries to return
       tags:
         - countries
       summary: Get countries with most questions + answers
@@ -254,6 +265,8 @@ paths:
         - questions
       summary: Delete a specific question
       description: Deletes question, returns operation code
+      security:
+        - api-key-header: []
       parameters:
         - name: question-id
           in: path
@@ -532,18 +545,6 @@ paths:
           type: integer
           maximum: 10
           description: No of entries to return
-        - name: city-id
-          in: query
-          description: City ID
-          type: integer
-        - name: country-id
-          in: query
-          description: Country ID
-          type: integer
-        - name: category-id
-          in: query
-          description: Category ID
-          type: integer
       responses:
         '200':
           description: successful operation
@@ -602,6 +603,8 @@ paths:
         - answers
       summary: Delete a specific answer
       description: Deletes answer, returns operation code
+      security:
+        - api-key-header: []
       parameters:
         - name: answer-id
           in: path
@@ -892,7 +895,7 @@ paths:
         default:
           description: Unexpected error
 
-  /votes/questions/{question-id}/{user-id}:
+  /votes/questions/{question-id}:
     get:
       tags:
         - votes
@@ -904,11 +907,6 @@ paths:
         - name: question-id
           in: path
           description: Question ID
-          required: true
-          type: integer
-        - name: user-id
-          in: path
-          description: User ID
           required: true
           type: integer
       responses:
@@ -929,11 +927,6 @@ paths:
         - name: question-id
           in: path
           description: Question ID
-          required: true
-          type: integer
-        - name: user-id
-          in: path
-          description: User ID
           required: true
           type: integer
         - name: body
@@ -959,18 +952,13 @@ paths:
           description: Question ID
           required: true
           type: integer
-        - name: user-id
-          in: path
-          description: User ID
-          required: true
-          type: integer
       responses:
         '200':
           description: successful operation
         default:
           description: Unexpected error
 
-  /votes/answers/{answer-id}/{user-id}:
+  /votes/answers/{answer-id}:
     get:
       tags:
         - votes
@@ -982,11 +970,6 @@ paths:
         - name: answer-id
           in: path
           description: Answer ID
-          required: true
-          type: integer
-        - name: user-id
-          in: path
-          description: User ID
           required: true
           type: integer
       responses:
@@ -1007,11 +990,6 @@ paths:
         - name: answer-id
           in: path
           description: Answer ID
-          required: true
-          type: integer
-        - name: user-id
-          in: path
-          description: User ID
           required: true
           type: integer
         - name: body
@@ -1037,18 +1015,13 @@ paths:
           description: Answer ID
           required: true
           type: integer
-        - name: user-id
-          in: path
-          description: User ID
-          required: true
-          type: integer
       responses:
         '200':
           description: successful operation
         default:
           description: Unexpected error
 
-  /votes/replies/{reply-id}/{user-id}:
+  /votes/replies/{reply-id}:
     get:
       tags:
         - votes
@@ -1060,11 +1033,6 @@ paths:
         - name: reply-id
           in: path
           description: Reply ID
-          required: true
-          type: integer
-        - name: user-id
-          in: path
-          description: User ID
           required: true
           type: integer
       responses:
@@ -1085,11 +1053,6 @@ paths:
         - name: reply-id
           in: path
           description: Reply ID
-          required: true
-          type: integer
-        - name: user-id
-          in: path
-          description: User ID
           required: true
           type: integer
         - name: body
@@ -1115,18 +1078,13 @@ paths:
           description: Reply ID
           required: true
           type: integer
-        - name: user-id
-          in: path
-          description: User ID
-          required: true
-          type: integer
       responses:
         '200':
           description: successful operation
         default:
           description: Unexpected error
 
-  /subscriptions/questions/{user-id}:
+  /subscriptions/questions:
     get:
       tags:
         - subscriptions
@@ -1137,11 +1095,6 @@ paths:
       security:
         - api-key-header: []
       parameters:
-        - name: user-id
-          in: path
-          description: User ID
-          required: true
-          type: integer
         - name: offset
           in: query
           type: integer
@@ -1159,7 +1112,7 @@ paths:
         default:
           description: Unexpected error
 
-  /subscriptions/cities/{user-id}:
+  /subscriptions/cities:
     get:
       tags:
         - subscriptions
@@ -1169,12 +1122,6 @@ paths:
       description: Returns multiple cities (id+name)
       security:
         - api-key-header: []
-      parameters:
-        - name: user-id
-          in: path
-          description: User ID
-          required: true
-          type: integer
       responses:
         '200':
           description: successful operation
@@ -1191,11 +1138,6 @@ paths:
       security:
         - api-key-header: []
       parameters:
-        - name: user-id
-          in: path
-          description: User ID
-          required: true
-          type: integer
         - name: body
           in: body
           description: Subscription type
@@ -1208,7 +1150,7 @@ paths:
         default:
           description: Unexpected error
 
-  /subscriptions/countries/{user-id}:
+  /subscriptions/countries:
     get:
       tags:
         - subscriptions
@@ -1218,12 +1160,6 @@ paths:
       description: Returns multiple countries (id+name)
       security:
         - api-key-header: []
-      parameters:
-        - name: user-id
-          in: path
-          description: User ID
-          required: true
-          type: integer
       responses:
         '200':
           description: successful operation
@@ -1240,11 +1176,6 @@ paths:
       security:
         - api-key-header: []
       parameters:
-        - name: user-id
-          in: path
-          description: User ID
-          required: true
-          type: integer
         - name: body
           in: body
           description: Subscription type
@@ -1610,14 +1541,6 @@ definitions:
   get-question-vote:
     type: object
     properties:
-      user-id:
-        type: integer
-        format: int32
-        example: 38702341
-      question-id:
-        type: integer
-        format: int32
-        example: 93027422
       vote-type:
         type: boolean
         example: false
@@ -1625,14 +1548,6 @@ definitions:
   get-answer-vote:
     type: object
     properties:
-      user-id:
-        type: integer
-        format: int32
-        example: 38702341
-      answer-id:
-        type: integer
-        format: int32
-        example: 93027422
       vote-type:
         type: boolean
         example: false
@@ -1640,14 +1555,6 @@ definitions:
   get-reply-vote:
     type: object
     properties:
-      user-id:
-        type: integer
-        format: int32
-        example: 38702341
-      reply-id:
-        type: integer
-        format: int32
-        example: 93027422
       vote-type:
         type: boolean
         example: false
@@ -1655,10 +1562,6 @@ definitions:
   post-new-question:
     type: object
     properties:
-      user-id:
-        type: integer
-        format: int32
-        example: 38702341
       city-id:
         type: integer
         format: int32
@@ -1679,18 +1582,16 @@ definitions:
           example: 82832332
 
   get-new-question-id:
-    description: Question ID
-    type: integer
-    format: int32
-    example: 93027422
+    type: object
+    properties:
+      question-id:
+        type: integer
+        format: int32
+        example: 93027422
 
   post-new-answer:
     type: object
     properties:
-      user-id:
-        type: integer
-        format: int32
-        example: 38702341
       question-id:
         type: integer
         format: int32
@@ -1711,10 +1612,6 @@ definitions:
   post-new-reply:
     type: object
     properties:
-      user-id:
-        type: integer
-        format: int32
-        example: 38702341
       answer-id:
         type: integer
         format: int32
@@ -1771,6 +1668,6 @@ definitions:
         type: string
         format: date-time
         example: "2020-05-15T10:20:30Z"
-      home-city-id:
+      city-id:
         type: integer
         example: 47983324

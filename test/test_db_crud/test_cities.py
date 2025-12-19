@@ -1,6 +1,10 @@
+# TODO: Add delete helpers after cascading fix is done
+
 from sqlalchemy.orm import Session
 import pytest
 from server.database.crud import Database
+from datetime import datetime
+
 
 def test_get_specific_city(db_session: Session):
     db = Database(db_session)
@@ -15,6 +19,7 @@ def test_get_specific_city(db_session: Session):
             "info": "Test city: Ankara"
         }
 
+
 def test_get_qa_counts_for_city(db_session: Session):
     db = Database(db_session)
     
@@ -25,6 +30,7 @@ def test_get_qa_counts_for_city(db_session: Session):
             "question-count": 2,
             "answer-count": 5
         }
+
 
 def test_get_cities_in_country(db_session: Session):
     db = Database(db_session)
@@ -45,6 +51,7 @@ def test_get_cities_in_country(db_session: Session):
                 "info": "Test city: Istanbul"
             }
         ]
+
 
 def test_get_most_conquered_cities(db_session: Session):
     db = Database(db_session)
@@ -70,25 +77,5 @@ def test_get_most_conquered_cities(db_session: Session):
                 "city-name": "Ankara",
                 "url": None,
                 "info": "Test city: Ankara"
-            }
-        ]
-
-def test_get_all_countries(db_session: Session):
-    db = Database(db_session)
-    
-    countries = db.get_all_countries()
-
-    assert countries == [
-            {
-                "country-id": 1,
-                "country-name": "Turkey"
-            },
-            {
-                "country-id": 2,
-                "country-name": "USA"
-            },
-            {
-                "country-id": 3,
-                "country-name": "Germany"
             }
         ]

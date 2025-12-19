@@ -1,5 +1,7 @@
+# TODO: Add cascade deletes
+
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Boolean, BLOB, Table
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.orm import relationship, declarative_base
 from datetime import datetime
 
@@ -11,17 +13,21 @@ class Question_Categories(Base):
     __tablename__ = 'question_categories'
     question_id = Column(Integer, ForeignKey('questions.question_id'), primary_key=True)
     category_id = Column(Integer, ForeignKey('categories.category_id'), primary_key=True)
+    active = Column(Boolean, server_default=text("true"), nullable=False)
 
 
 class City_Subscriptions(Base):
     __tablename__ = 'city_subscriptions'
     city_id = Column(Integer, ForeignKey('cities.city_id'), primary_key=True)
     user_id = Column(Integer, ForeignKey('users.user_id'), primary_key=True)
+    active = Column(Boolean, server_default=text("true"), nullable=False)
+
 
 class Country_Subscriptions(Base):
     __tablename__ = 'country_subscriptions'
     country_id = Column(Integer, ForeignKey('countries.country_id'), primary_key=True)
     user_id = Column(Integer, ForeignKey('users.user_id'), primary_key=True)
+    active = Column(Boolean, server_default=text("true"), nullable=False)
 
 
 # Voting tables
@@ -36,6 +42,9 @@ class Question_Votes(Base):
     
     vote_type = Column(Boolean, nullable=False)
 
+    active = Column(Boolean, server_default=text("true"), nullable=False)
+
+
 class Answer_Votes(Base):
     __tablename__ = 'answer_votes'
     user_id = Column(Integer, ForeignKey('users.user_id'), primary_key=True)
@@ -45,6 +54,9 @@ class Answer_Votes(Base):
     answer_of_vote = relationship('Answers', back_populates='votes_of_answer')
     vote_type = Column(Boolean, nullable=False)
 
+    active = Column(Boolean, server_default=text("true"), nullable=False)
+
+
 class Reply_Votes(Base):
     __tablename__ = 'reply_votes'
     user_id = Column(Integer, ForeignKey('users.user_id'), primary_key=True)
@@ -53,6 +65,8 @@ class Reply_Votes(Base):
     reply_id = Column(Integer, ForeignKey('replies.reply_id'), primary_key=True)
     reply_of_vote = relationship('Replies', back_populates='votes_of_reply')
     vote_type = Column(Boolean, nullable=False)
+
+    active = Column(Boolean, server_default=text("true"), nullable=False)
 
 
 # Base tables
@@ -92,9 +106,10 @@ class Users(Base):
     username = Column(String(32), nullable=False, unique=True)
     full_name = Column(String(64))
     e_mail_addr = Column(String(254), nullable=False, unique=True)
-    time_created = Column(DateTime, default=datetime.utcnow, nullable=False)
+    time_created = Column(DateTime, default=datetime.utcnow, server_default=text("CURRENT_TIMESTAMP"), nullable=False)
     user_img = Column(BLOB)
     password = Column(String(32), nullable=False)
+    active = Column(Boolean, server_default=text("true"), nullable=False)
     
     city_id = Column(Integer, ForeignKey('cities.city_id'))
     city_of_user = relationship('Cities', back_populates='users_of_city')
@@ -122,9 +137,10 @@ class Categories(Base):
 class Questions(Base):
     __tablename__ = 'questions'
     question_id = Column(Integer, primary_key=True, autoincrement=True)
-    time_created = Column(DateTime, default=datetime.utcnow, nullable=False)
+    time_created = Column(DateTime, default=datetime.utcnow, server_default=text("CURRENT_TIMESTAMP"), nullable=False)
     question_title = Column(String(150), nullable=False)
     question_body = Column(String(5000), nullable=False)
+    active = Column(Boolean, server_default=text("true"), nullable=False)
 
     user_id = Column(Integer, ForeignKey('users.user_id'), nullable=False)
     user_of_question = relationship('Users', back_populates='questions_of_user')
@@ -143,7 +159,8 @@ class Answers(Base):
     __tablename__ = 'answers'
     answer_id = Column(Integer, primary_key=True, autoincrement=True)
     answer_body = Column(String(5000), nullable=False)
-    time_created = Column(DateTime, default=datetime.utcnow, nullable=False)
+    time_created = Column(DateTime, default=datetime.utcnow, server_default=text("CURRENT_TIMESTAMP"), nullable=False)
+    active = Column(Boolean, server_default=text("true"), nullable=False)
 
     user_id = Column(Integer, ForeignKey('users.user_id'), nullable=False)
     user_of_answer = relationship('Users', back_populates='answers_of_user')
@@ -160,7 +177,8 @@ class Replies(Base):
     __tablename__ = 'replies'
     reply_id = Column(Integer, primary_key=True, autoincrement=True)
     reply_body = Column(String(2500), nullable=False)
-    time_created = Column(DateTime, default=datetime.utcnow, nullable=False)
+    time_created = Column(DateTime, default=datetime.utcnow, server_default=text("CURRENT_TIMESTAMP"), nullable=False)
+    active = Column(Boolean, server_default=text("true"), nullable=False)
 
     answer_id = Column(Integer, ForeignKey('answers.answer_id'), nullable=False)
     answer_of_reply = relationship('Answers', back_populates='replies_of_answer')

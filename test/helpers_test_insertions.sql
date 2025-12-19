@@ -17,7 +17,8 @@ INSERT INTO users (user_id, username, full_name, e_mail_addr, time_created, pass
 (1, 'alice', 'Alice A', 'alice@test.com', '2025-11-20 09:10:00', 'md5_like_hash_aaaaaaaaaaaaaaa', 1),
 (2, 'bob',   'Bob B',   'bob@test.com',   '2025-11-22 11:25:00', 'md5_like_hash_bbbbbbbbbbbbbbb', 2),
 (3, 'carol', 'Carol C', 'carol@test.com', '2025-11-28 15:40:00', 'md5_like_hash_cccccccccccccccc', 3),
-(4, 'dave',  'Dave D',  'dave@test.com',  '2025-12-01 08:05:00', 'md5_like_hash_dddddddddddddddd', 5);
+(4, 'dave',  'Dave D',  'dave@test.com',  '2025-12-01 08:05:00', 'md5_like_hash_dddddddddddddddd', 5),
+(5, 'sub_guy', 'mr subscriber', 'subguy@test.com', '2025-12-02 10:00:00', 'md5_like_hash_eeeeeeeeeeeeeee', NULL);
 
 -- CATEGORIES
 INSERT INTO categories (category_id, category_label) VALUES

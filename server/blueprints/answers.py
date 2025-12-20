@@ -1,5 +1,6 @@
 from sanic import Blueprint, Request, exceptions, json
 from server.common.check_token import check_token
+from server.common.datetime_json import datetime_to_json_formatting
 
 bp = Blueprint("Answers", url_prefix="/answers")
 
@@ -37,7 +38,7 @@ async def get_specific_answer(request: Request, answer_id: int):
     if not answer:
         raise exceptions.NotFound("Answer not found.")
 
-    return json(body=answer)
+    return json(body=answer, default=datetime_to_json_formatting)
 
 
 @bp.get("/<answer_id:int>/counts")

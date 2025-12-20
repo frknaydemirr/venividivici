@@ -1,5 +1,6 @@
 from sanic import Blueprint, Request, exceptions, json
 from server.common.check_token import check_token
+from server.common.datetime_json import datetime_to_json_formatting
 
 bp = Blueprint("Replies", url_prefix="/replies")
 
@@ -37,7 +38,7 @@ async def get_specific_reply(request: Request, reply_id: int):
     if not reply:
         raise exceptions.NotFound("Reply not found.")
 
-    return json(body=reply)
+    return json(body=reply, default=datetime_to_json_formatting)
 
 
 @bp.get("/by-answer/<answer_id:int>")

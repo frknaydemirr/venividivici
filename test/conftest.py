@@ -42,7 +42,7 @@ APISession = sessionmaker(bind=api_engine)
 Base.metadata.create_all(bind=api_engine)
 run_query_file(api_engine, 'test/api_test_insertions.sql')
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope='module')
 def sanic_instance():
     # Setup
     connection = api_engine.connect()

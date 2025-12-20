@@ -53,18 +53,19 @@ def run_query_file(engine, file_path):
             db_api_connection.executescript(query.text)
 
 
-def create_test_app(parameters = None) -> Sanic: 
+def create_test_app(parameters = None, external_session = None) -> Sanic: 
     module_names = DEFAULT
 
     app = Sanic(name="venividivici")
     db_url = ""
 
-    api_engine = create_engine('sqlite:///:memory:')
-    APISession = sessionmaker(bind=api_engine)
-    Base.metadata.create_all(bind=api_engine)
-    run_query_file(api_engine, 'test/helpers_test_insertions.sql')
+    if not external_session:
+        api_engine = create_engine('sqlite:///:memory:')
+        APISession = sessionmaker(bind=api_engine)
+        Base.metadata.create_all(bind=api_engine)
+        run_query_file(api_engine, 'test/helpers_test_insertions.sql')
 
-    external_session = APISession(bind=api_engine)  
+        external_session = APISession(bind=api_engine)  
 
     if not app.config.get("CORS-ORIGINS"):
         app.config.CORS_ORIGINS = "*"

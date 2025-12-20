@@ -6,7 +6,7 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 
 from sanic import Sanic
-from server.server import create_app
+from server.server import create_test_app
 
 def run_query_file(engine, file_path):
     with engine.begin() as connection:
@@ -50,7 +50,7 @@ def sanic_instance():
 
     session = APISession(bind=connection)
     
-    app = create_app("venividivici", external_session=session)
+    app = create_test_app("venividivici", external_session=session)
 
     yield app
 

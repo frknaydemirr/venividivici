@@ -2,8 +2,12 @@
 # TODO: Put upper limit on limit parameters
 # TODO: Add await
 
-from sanic import Sanic, text, Request, json, exceptions, file
+from sanic import Sanic, Request, json, exceptions, file
 from http import HTTPMethod
+
+from sqlalchemy import create_engine, text
+from sqlalchemy.orm import sessionmaker
+from server.database.models import Base
 
 from server.worker.module import setup_modules
 from server.worker.db_setup import setup_db
@@ -22,8 +26,8 @@ DEFAULT = (
     "server.blueprints.votes",
 )
 
-# Specify external session for testing purposes
-def create_app(parameters = None, external_session = None) -> Sanic:
+
+def create_app(parameters = None) -> Sanic:
     module_names = DEFAULT
 
     app = Sanic(name="venividivici")
@@ -33,11 +37,40 @@ def create_app(parameters = None, external_session = None) -> Sanic:
     if not app.config.get("CORS-ORIGINS"):
         app.config.CORS_ORIGINS = "*"
 
-    if external_session:
-        setup_db(app_name="venividivici", db_url=db_url, external_session=external_session)
-    else:
-        setup_db(app_name="venividivici", db_url=db_url)
+    
+    setup_db(app_name="venividivici", db_url=db_url)
  
+    setup_modules(app, *module_names)
+
+    return app
+
+
+def run_query_file(engine, file_path):
+    with engine.begin() as connection:
+        db_api_connection = connection.connection
+        with open(file_path) as file:
+            query = text(file.read())
+            db_api_connection.executescript(query.text)
+
+
+def create_test_app(parameters = None) -> Sanic: 
+    module_names = DEFAULT
+
+    app = Sanic(name="venividivici")
+    db_url = ""
+
+    api_engine = create_engine('sqlite:///:memory:')
+    APISession = sessionmaker(bind=api_engine)
+    Base.metadata.create_all(bind=api_engine)
+    run_query_file(api_engine, 'test/helpers_test_insertions.sql')
+
+    external_session = APISession(bind=api_engine)  
+
+    if not app.config.get("CORS-ORIGINS"):
+        app.config.CORS_ORIGINS = "*"
+
+    setup_db(app_name="venividivici", db_url=db_url, external_session=external_session)
+    
     setup_modules(app, *module_names)
 
     return app

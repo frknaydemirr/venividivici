@@ -16,9 +16,12 @@ async def delete_user_vote_for_question(request: Request, question_id: int):
 async def get_user_vote_for_question(request: Request, question_id: int):
     user_id = check_token(request)
 
-    vote = request.app.ctx.db.get_user_vote_for_question(user_id=user_id, question_id=question_id)
+    vote: dict = request.app.ctx.db.get_user_vote_for_question(user_id=user_id, question_id=question_id)
+    
+    if not vote:
+        raise exceptions.NotFound("Vote not found.")
 
-    return json(body={"vote-type": vote})
+    return json(body=vote)
 
 
 @bp.post("/questions/<question_id:int>")
@@ -47,9 +50,12 @@ async def delete_user_vote_for_answer(request: Request, answer_id: int):
 async def get_user_vote_for_answer(request: Request, answer_id: int):
     user_id = check_token(request)
 
-    vote = request.app.ctx.db.get_user_vote_for_answer(user_id=user_id, answer_id=answer_id)
+    vote: dict = request.app.ctx.db.get_user_vote_for_answer(user_id=user_id, answer_id=answer_id)
 
-    return json(body={"vote-type": vote})
+    if not vote:
+        raise exceptions.NotFound("Vote not found.")
+
+    return json(vote)
 
 
 @bp.post("/answers/<answer_id:int>")
@@ -76,11 +82,14 @@ async def delete_user_vote_for_reply(request: Request, reply_id: int):
 
 @bp.get("/replies/<reply_id:int>")
 async def get_user_vote_for_reply(request: Request, reply_id: int):
-    user_id = check_token(request, user_id)
+    user_id = check_token(request)
 
-    vote = request.app.ctx.db.get_user_vote_for_reply(user_id=user_id, reply_id=reply_id)
+    vote: dict = request.app.ctx.db.get_user_vote_for_reply(user_id=user_id, reply_id=reply_id)
 
-    return json(body={"vote-type": vote})
+    if not vote:
+        raise exceptions.NotFound("Vote not found.")
+
+    return json(vote)
 
 
 @bp.post("/replies/<reply_id:int>")

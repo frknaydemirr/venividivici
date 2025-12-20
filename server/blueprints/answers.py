@@ -10,6 +10,9 @@ async def delete_answer(request: Request, answer_id: int):
 
     answer = request.app.ctx.db.get_specific_answer(answer_id=answer_id)
     
+    if not answer:
+        raise exceptions.NotFound("Answer not found.")
+
     if request.app.ctx.db.get_user_id(answer["username"]) != user_id:
         raise exceptions.Forbidden("You do not have permission to delete this answer.")
 

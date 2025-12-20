@@ -10,6 +10,9 @@ async def delete_question(request: Request, question_id: int):
 
     question = request.app.ctx.db.get_specific_question(question_id=question_id)
     
+    if not question:
+        raise exceptions.NotFound("Question not found.")
+
     if request.app.ctx.db.get_user_id(question["username"]) != user_id:
         raise exceptions.Forbidden("You do not have permission to delete this question.")
 

@@ -10,6 +10,9 @@ async def delete_reply(request: Request, reply_id: int):
 
     reply = request.app.ctx.db.get_specific_reply(reply_id=reply_id)
     
+    if not reply:
+        raise exceptions.NotFound("Reply not found.")
+
     if request.app.ctx.db.get_user_id(reply["username"]) != user_id:
         raise exceptions.Forbidden("You do not have permission to delete this reply.")
 

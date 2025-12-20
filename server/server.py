@@ -63,7 +63,7 @@ def create_test_app(parameters = None, external_session = None) -> Sanic:
         api_engine = create_engine('sqlite:///:memory:')
         APISession = sessionmaker(bind=api_engine)
         Base.metadata.create_all(bind=api_engine)
-        run_query_file(api_engine, 'test/helpers_test_insertions.sql')
+        run_query_file(api_engine, 'test/api_test_insertions.sql')
 
         external_session = APISession(bind=api_engine)  
 

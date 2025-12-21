@@ -1,4 +1,5 @@
 from sanic import Blueprint, Request, exceptions, json
+from server.common.datetime_json import datetime_to_json_formatting
 
 bp = Blueprint("Search", url_prefix="/search")
 
@@ -38,4 +39,4 @@ async def search_questions(request: Request, query: str):
     if not questions:
         raise exceptions.NotFound("No questions found matching the query.")
 
-    return json(body=questions)
+    return json(body=questions, default=datetime_to_json_formatting)

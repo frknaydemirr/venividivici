@@ -54,7 +54,7 @@ async def get_replies_of_answer(request: Request, answer_id: int):
     if not replies:
         raise exceptions.NotFound("No replies found for the specified answer.")
 
-    return json(body=replies)
+    return json(body=replies, default=datetime_to_json_formatting)
 
 
 @bp.get("/<reply_id:int>/counts")
@@ -77,4 +77,4 @@ async def get_replies_of_user(request: Request, username: str):
     if not replies:
         raise exceptions.NotFound("No replies found for the specified user.")
 
-    return json(body=replies)
+    return json(body=replies, default=datetime_to_json_formatting)

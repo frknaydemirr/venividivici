@@ -1,4 +1,5 @@
 from sanic import Blueprint, Request, exceptions, json
+from server.common.datetime_json import datetime_to_json_formatting
 
 bp = Blueprint("Users", url_prefix="/users")
 
@@ -9,4 +10,4 @@ async def get_user_info(request: Request, username: str):
     if not user_info:
         raise exceptions.NotFound("User not found.")
 
-    return json(body=user_info)
+    return json(body=user_info, default=datetime_to_json_formatting)

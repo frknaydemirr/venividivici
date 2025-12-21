@@ -143,4 +143,4 @@ async def get_questions_by_user(request: Request, username: str):
     if not questions:    
         raise exceptions.NotFound("No questions found for the specified user.")
     
-    return json(body=questions)
+    return json(body=questions, default=datetime_to_json_formatting)

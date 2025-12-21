@@ -64,7 +64,7 @@ async def get_answers_by_question(request: Request, question_id: int):
     if not answers:
         raise exceptions.NotFound("No answers found for the specified question.")
 
-    return json(body=answers)
+    return json(body=answers, default=datetime_to_json_formatting)
 
 
 @bp.get("/by-user/<username:str>")
@@ -77,4 +77,4 @@ async def get_answers_by_user(request: Request, username: str):
     if not answers:
         raise exceptions.NotFound("No answers found for the specified user.")
 
-    return json(body=answers)
+    return json(body=answers, default=datetime_to_json_formatting)

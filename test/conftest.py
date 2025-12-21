@@ -1,3 +1,7 @@
+# TODO: Add unauthenticated tests to API
+# TODO: Add negative tests to API (404 etc.)
+# TODO: Add tests for counts and filtering to API
+
 import pytest
 
 from server.database.models import Base

@@ -26,4 +26,34 @@ def test_post_answer(sanic_instance: Sanic):
 
     assert get_resp.status == 200
     assert get_resp.json["answer-body"] == "test post answer body"
-    
+
+
+def test_get_answer(sanic_instance: Sanic):
+    get_req, get_resp = sanic_instance.test_client.get("/answers/3")
+
+    assert get_resp.status == 200
+    assert get_resp.json["answer-body"] == "get answer body"
+
+
+def test_get_answers_by_question(sanic_instance: Sanic):
+    get_req, get_resp = sanic_instance.test_client.get("/answers/by-question/12?offset=0&limit=5")
+
+    assert get_resp.status == 200
+    assert len(get_resp.json) == 2
+
+    accepted_bodies = ['first answer of question body', 'second answer of question body']
+    for answer in get_resp.json:
+        assert answer["question-id"] == 12
+        assert answer["answer-body"] in accepted_bodies
+
+
+def test_get_answers_by_user(sanic_instance: Sanic):    
+    get_req, get_resp = sanic_instance.test_client.get("/answers/by-user/entry_get_user?offset=0&limit=10")
+
+    assert get_resp.status == 200
+    assert len(get_resp.json) == 3
+
+    accepted_bodies = ['first answer of question body', 'second answer of question body', 'get answer body']
+    for answer in get_resp.json:
+        assert answer["username"] == "entry_get_user"
+        assert answer["answer-body"] in accepted_bodies

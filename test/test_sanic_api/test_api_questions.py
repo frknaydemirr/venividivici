@@ -29,3 +29,20 @@ def test_post_question(sanic_instance: Sanic):
     assert get_resp.status == 200
     assert get_resp.json["question-title"] == "test post question title"
     assert get_resp.json["question-body"] == "test post question body"
+
+
+def test_get_question(sanic_instance: Sanic):
+    get_req, get_resp = sanic_instance.test_client.get("/questions/11")
+
+    assert get_resp.status == 200
+    assert get_resp.json["question-title"] == "get question title"
+
+
+def test_get_questions_of_user(sanic_instance: Sanic):
+    get_req, get_resp = sanic_instance.test_client.get("/questions/by-user/questions_user")
+
+    assert get_resp.status == 200
+    assert len(get_resp.json) == 2
+    
+    for question in get_resp.json:
+        assert question["question-id"] in [14, 15]

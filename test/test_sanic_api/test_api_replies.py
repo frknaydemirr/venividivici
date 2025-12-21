@@ -26,3 +26,28 @@ def test_post_reply(sanic_instance: Sanic):
 
     assert get_resp.status == 200
     assert get_resp.json["reply-body"] == "test post reply body"
+
+
+def test_get_reply(sanic_instance: Sanic):
+    get_req, get_resp = sanic_instance.test_client.get("/replies/3")
+
+    assert get_resp.status == 200
+    assert get_resp.json["reply-body"] == "get reply body"
+
+
+def test_get_replies_of_answer(sanic_instance: Sanic):
+    get_req, get_resp = sanic_instance.test_client.get("/replies/by-answer/6")
+
+    assert get_resp.status == 200
+    assert len(get_resp.json) == 2
+
+    for reply in get_resp.json:
+        assert reply["reply-id"] in [4, 5]
+
+
+def test_get_replies_of_user(sanic_instance: Sanic):
+    get_req, get_resp = sanic_instance.test_client.get("/replies/by-user/replies_user")
+
+    assert get_resp.status == 200
+    assert len(get_resp.json) == 1
+    assert get_resp.json[0]["reply-id"] == 6

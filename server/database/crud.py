@@ -111,7 +111,7 @@ class Converter:
             answer_list.append({
                 "answer-id": answer.answer_id,
                 "answer-body": answer.answer_body,
-                "answered-by": answer.username,
+                "username": answer.username,
                 "creation-time": answer.time_created,
                 "question-id": answer.question_id
             })
@@ -126,7 +126,7 @@ class Converter:
             reply_list.append({
                 "reply-id": reply.reply_id,
                 "reply-body": reply.reply_body,
-                "replied-by": reply.username,
+                "username": reply.username,
                 "creation-time": reply.time_created,
                 "answer-id": reply.answer_id
             })

@@ -22,7 +22,7 @@ def run_query_file(engine, file_path):
             db_api_connection.executescript(query.text)
 
 
-helpers_engine = create_engine('sqlite:///:memory:')
+helpers_engine = create_engine('sqlite:///:memory:', connect_args={"check_same_thread": False})
 HelpersSession = sessionmaker(bind=helpers_engine)
 Base.metadata.create_all(bind=helpers_engine)
 run_query_file(helpers_engine, 'test/helpers_test_insertions.sql')
@@ -43,7 +43,7 @@ def db_session():
     connection.close()
 
 
-api_engine = create_engine('sqlite:///:memory:')
+api_engine = create_engine('sqlite:///:memory:', connect_args={"check_same_thread": False})
 APISession = sessionmaker(bind=api_engine)
 Base.metadata.create_all(bind=api_engine)
 run_query_file(api_engine, 'test/api_test_insertions.sql')

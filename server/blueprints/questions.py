@@ -2,6 +2,8 @@ from sanic import Blueprint, Request, exceptions, json
 from server.common.check_token import check_token
 from server.common.datetime_json import datetime_to_json_formatting
 
+import json as json_lib
+
 bp = Blueprint("Questions", url_prefix="/questions")
 
 @bp.delete("/<question_id:int>")
@@ -57,6 +59,12 @@ async def get_question_answer_vote_counts(request: Request, question_id: int):
 
 @bp.get("/most-answered")
 async def get_most_answered_questions(request: Request):
+    r = request.app.ctx.redis
+
+    cached = await r.get("most_answered_questions")
+    if cached:
+        return json(body=json_lib.loads(cached))
+
     offset = int(request.args.get("offset", 0))
     limit = int(request.args.get("limit", 10))
 
@@ -65,6 +73,7 @@ async def get_most_answered_questions(request: Request):
     if not questions:    
         raise exceptions.NotFound("No questions found.")
     
+    await r.set("most_answered_questions", json_lib.dumps(questions), ex=600)  # Cache for 10 minutes
     return json(body=questions)
 
 
@@ -96,6 +105,12 @@ async def get_most_answered_questions_by_country(request: Request, country_id: i
 
 @bp.get("/recent")
 async def get_recent_questions(request: Request):
+    r = request.app.ctx.redis
+
+    cached = await r.get("recent_questions")
+    if cached:
+        return json(body=json_lib.loads(cached))
+
     offset = int(request.args.get("offset", 0))
     limit = int(request.args.get("limit", 10))
 
@@ -104,6 +119,7 @@ async def get_recent_questions(request: Request):
     if not questions:    
         raise exceptions.NotFound("No questions found.")
     
+    await r.set("recent_questions", json_lib.dumps(questions), ex=600)  # Cache for 10 minutes
     return json(body=questions)
 
 

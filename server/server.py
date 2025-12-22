@@ -1,6 +1,7 @@
 # TODO: Add questions by category endpoints
 # TODO: Put upper limit on limit parameters
 # TODO: Add await
+# TODO: Put all hosts, ports to .env file
 
 from sanic import Sanic, Request, json, exceptions, file
 from http import HTTPMethod
@@ -11,6 +12,8 @@ from server.database.models import Base
 
 from server.worker.module import setup_modules
 from server.worker.db_setup import setup_db
+
+from sanic_redis import SanicRedis
 
 DEFAULT = (
     "server.blueprints.answers",
@@ -29,20 +32,28 @@ DEFAULT = (
 
 def create_app(parameters = None) -> Sanic:
     module_names = DEFAULT
+    app_name = "venividivici"
 
-    app = Sanic(name="venividivici")
+    app = Sanic(name=app_name)
+
     db_url = "sqlite:///:memory:"
-
+    setup_db(app_name=app_name, db_url=db_url)
 
     if not app.config.get("CORS-ORIGINS"):
         app.config.CORS_ORIGINS = "*"
 
-    
-    setup_db(app_name="venividivici", db_url=db_url)
- 
     setup_modules(app, *module_names)
 
+    # Redis Configuration
+    app.config.update({
+        "REDIS": "redis://localhost:6379/0",
+    })
+
+    redis = SanicRedis(app)
+    redis.init_app(app)
+
     return app
+
 
 
 def run_query_file(engine, file_path):
@@ -52,6 +63,9 @@ def run_query_file(engine, file_path):
             query = text(file.read())
             db_api_connection.executescript(query.text)
 
+
+
+################ TESTING APP CREATION ###############
 
 def create_test_app(parameters = None, external_session = None) -> Sanic: 
     module_names = DEFAULT
@@ -73,5 +87,13 @@ def create_test_app(parameters = None, external_session = None) -> Sanic:
     setup_db(app_name="venividivici", db_url=db_url, external_session=external_session)
     
     setup_modules(app, *module_names)
+
+    # Redis Configuration
+    app.config.update({
+        "REDIS": "redis://localhost:6379/0",
+    })
+
+    redis = SanicRedis(app)
+    redis.init_app(app)
 
     return app

@@ -1,4 +1,5 @@
 from sanic import Blueprint, Request, exceptions, json
+import json as json_lib
 
 bp = Blueprint("Countries", url_prefix="/countries")
 
@@ -34,6 +35,12 @@ async def get_country(request: Request, country_id: int):
 
 @bp.get("/most-conquered")
 async def get_most_conquered_countries(request: Request):
+    r = request.app.ctx.redis
+    
+    cached = await r.get("most_conquered_countries")
+    if cached:
+        return json(body=json_lib.loads(cached))
+
     limit = int(request.args.get("limit", 10))
 
     countries = request.app.ctx.db.get_most_conquered_countries(limit=limit)
@@ -41,4 +48,5 @@ async def get_most_conquered_countries(request: Request):
     if not countries:
         raise exceptions.NotFound("No countries found.")
 
+    await r.set("most_conquered_countries", json_lib.dumps(countries), ex=600)  # Cache for 10 minutes
     return json(body=countries)

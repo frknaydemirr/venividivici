@@ -1,6 +1,8 @@
 # TODO: Add unauthenticated tests to API
 # TODO: Add negative tests to API (404 etc.)
 # TODO: Add tests for counts and filtering to API
+# TODO: Add delete helpers tests for CRUD
+# TODO: Add Redis tests
 
 import pytest
 

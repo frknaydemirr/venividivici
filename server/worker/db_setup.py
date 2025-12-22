@@ -16,7 +16,8 @@ def setup_db(app_name: str, db_url: str, external_session = None) -> None:
             app.ctx.db = Database(external_session)
             return
 
-        engine = create_engine(db_url)
+        # MySQL Setup
+        engine = create_engine(db_url, pool_size=20)
         session = Session(engine)
 
         ext = External_API_Helpers(session)

@@ -4,30 +4,33 @@ from server.common.datetime_json import datetime_to_json_formatting
 
 import json as json_lib
 
+import asyncio
+
 bp = Blueprint("Questions", url_prefix="/questions")
 
 @bp.delete("/<question_id:int>")
 async def delete_question(request: Request, question_id: int):
-    user_id = check_token(request)
+    user_id = await check_token(request)
 
-    question = request.app.ctx.db.get_specific_question(question_id=question_id)
+    question = await asyncio.to_thread(request.app.ctx.db.get_specific_question, question_id=question_id)
     
     if not question:
         raise exceptions.NotFound("Question not found.")
 
-    if request.app.ctx.db.get_user_id(question["username"]) != user_id:
+    user_id_of_username = await asyncio.to_thread(request.app.ctx.db.get_user_id, question["username"])
+    if user_id_of_username != user_id:
         raise exceptions.Forbidden("You do not have permission to delete this question.")
 
-    request.app.ctx.db.delete_specific_question(question_id=question_id)
+    await asyncio.to_thread(request.app.ctx.db.delete_specific_question, question_id=question_id)
 
     return json(body={"status": "SUCCESS"})
 
 
 @bp.post("/")
 async def post_new_question(request: Request):
-    user_id = check_token(request)
+    user_id = await check_token(request)
     
-    new_question_id = request.app.ctx.db.post_new_question(
+    new_question_id = await asyncio.to_thread(request.app.ctx.db.post_new_question,
         user_id=user_id,
         city_id=request.json["city-id"],
         question_title=request.json["question-title"],
@@ -39,7 +42,7 @@ async def post_new_question(request: Request):
 
 @bp.get("/<question_id:int>")
 async def get_specific_question(request: Request, question_id: int):
-    question = request.app.ctx.db.get_specific_question(question_id=question_id)
+    question = await asyncio.to_thread(request.app.ctx.db.get_specific_question, question_id=question_id)
 
     if not question:
         raise exceptions.NotFound("Question not found.")
@@ -49,7 +52,7 @@ async def get_specific_question(request: Request, question_id: int):
 
 @bp.get("/<question_id:int>/counts")
 async def get_question_answer_vote_counts(request: Request, question_id: int):
-    counts = request.app.ctx.db.get_question_answer_and_vote_counts(question_id=question_id)
+    counts = await asyncio.to_thread(request.app.ctx.db.get_question_answer_and_vote_counts, question_id=question_id)
 
     if not counts:
         raise exceptions.NotFound("Question not found.")
@@ -68,7 +71,7 @@ async def get_most_answered_questions(request: Request):
     offset = int(request.args.get("offset", 0))
     limit = int(request.args.get("limit", 10))
 
-    questions = request.app.ctx.db.get_most_answered_questions(offset=offset, limit=limit)
+    questions = await asyncio.to_thread(request.app.ctx.db.get_most_answered_questions, offset=offset, limit=limit)
     
     if not questions:    
         raise exceptions.NotFound("No questions found.")
@@ -82,7 +85,7 @@ async def get_most_answered_questions_by_city(request: Request, city_id: int):
     offset = int(request.args.get("offset", 0))
     limit = int(request.args.get("limit", 10))
 
-    questions = request.app.ctx.db.get_most_answered_questions_in_city(city_id=city_id, offset=offset, limit=limit)
+    questions = await asyncio.to_thread(request.app.ctx.db.get_most_answered_questions_in_city, city_id=city_id, offset=offset, limit=limit)
     
     if not questions:    
         raise exceptions.NotFound("No questions found for the specified city.")
@@ -95,7 +98,7 @@ async def get_most_answered_questions_by_country(request: Request, country_id: i
     offset = int(request.args.get("offset", 0))
     limit = int(request.args.get("limit", 10))
 
-    questions = request.app.ctx.db.get_most_answered_questions_in_country(country_id=country_id, offset=offset, limit=limit)
+    questions = await asyncio.to_thread(request.app.ctx.db.get_most_answered_questions_in_country, country_id=country_id, offset=offset, limit=limit)
     
     if not questions:    
         raise exceptions.NotFound("No questions found for the specified country.")
@@ -114,7 +117,7 @@ async def get_recent_questions(request: Request):
     offset = int(request.args.get("offset", 0))
     limit = int(request.args.get("limit", 10))
 
-    questions = request.app.ctx.db.get_recent_questions(offset=offset, limit=limit)
+    questions = await asyncio.to_thread(request.app.ctx.db.get_recent_questions, offset=offset, limit=limit)
     
     if not questions:    
         raise exceptions.NotFound("No questions found.")
@@ -128,7 +131,7 @@ async def get_recent_questions_by_city(request: Request, city_id: int):
     offset = int(request.args.get("offset", 0))
     limit = int(request.args.get("limit", 10))
 
-    questions = request.app.ctx.db.get_recent_questions_of_city(city_id=city_id, offset=offset, limit=limit)
+    questions = await asyncio.to_thread(request.app.ctx.db.get_recent_questions_of_city, city_id=city_id, offset=offset, limit=limit)
     
     if not questions:    
         raise exceptions.NotFound("No questions found for the specified city.")
@@ -141,7 +144,7 @@ async def get_recent_questions_by_country(request: Request, country_id: int):
     offset = int(request.args.get("offset", 0))
     limit = int(request.args.get("limit", 10))
 
-    questions = request.app.ctx.db.get_recent_questions_of_country(country_id=country_id, offset=offset, limit=limit)
+    questions = await asyncio.to_thread(request.app.ctx.db.get_recent_questions_of_country, country_id=country_id, offset=offset, limit=limit)
     
     if not questions:    
         raise exceptions.NotFound("No questions found for the specified country.")
@@ -154,7 +157,7 @@ async def get_questions_by_user(request: Request, username: str):
     offset = int(request.args.get("offset", 0))
     limit = int(request.args.get("limit", 10))
 
-    questions = request.app.ctx.db.get_questions_of_user(username=username, offset=offset, limit=limit)
+    questions = await asyncio.to_thread(request.app.ctx.db.get_questions_of_user, username=username, offset=offset, limit=limit)
     
     if not questions:    
         raise exceptions.NotFound("No questions found for the specified user.")

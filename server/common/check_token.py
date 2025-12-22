@@ -1,7 +1,8 @@
 from sanic import Request, exceptions
 import jwt
+import asyncio
 
-def check_token(request: Request) -> int:
+async def check_token(request: Request) -> int:
     auth_header = request.headers.get("Authorization")
     if not auth_header or not auth_header.startswith("Bearer "):
         raise exceptions.Unauthorized("Authorization header missing or invalid.")
@@ -14,7 +15,8 @@ def check_token(request: Request) -> int:
     except jwt.InvalidTokenError:
         raise exceptions.Unauthorized("Invalid token.")
     
-    if not request.app.ctx.db.get_user_exists_by_id(decoded_token.get("user_id")):
+    user_exists = await asyncio.to_thread(request.app.ctx.db.get_user_exists_by_id, decoded_token.get("user_id"))
+    if not user_exists:
         raise exceptions.Unauthorized("Invalid token.")
 
     return decoded_token.get("user_id")

@@ -1,6 +1,5 @@
 # TODO: Add questions by category endpoints
 # TODO: Put upper limit on limit parameters
-# TODO: Add await
 # TODO: Put all hosts, ports to .env file
 
 from sanic import Sanic, Request, json, exceptions, file

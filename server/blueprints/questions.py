@@ -82,6 +82,12 @@ async def get_most_answered_questions(request: Request):
 
 @bp.get("/most-answered/by-city/<city_id:int>")
 async def get_most_answered_questions_by_city(request: Request, city_id: int):
+    r = request.app.ctx.redis
+
+    cached = await r.get(f"{city_id}_city_most_answered_questions")
+    if cached:
+        return json(body=json_lib.loads(cached))
+
     offset = int(request.args.get("offset", 0))
     limit = int(request.args.get("limit", 10))
 
@@ -90,11 +96,18 @@ async def get_most_answered_questions_by_city(request: Request, city_id: int):
     if not questions:    
         raise exceptions.NotFound("No questions found for the specified city.")
     
+    await r.set(f"{city_id}_city_most_answered_questions", json_lib.dumps(questions), ex=600)  # Cache for 10 minutes
     return json(body=questions)
 
 
 @bp.get("/most-answered/by-country/<country_id:int>")
 async def get_most_answered_questions_by_country(request: Request, country_id: int):
+    r = request.app.ctx.redis
+
+    cached = await r.get(f"{country_id}_country_most_answered_questions")
+    if cached:
+        return json(body=json_lib.loads(cached))
+
     offset = int(request.args.get("offset", 0))
     limit = int(request.args.get("limit", 10))
 
@@ -103,6 +116,7 @@ async def get_most_answered_questions_by_country(request: Request, country_id: i
     if not questions:    
         raise exceptions.NotFound("No questions found for the specified country.")
     
+    await r.set(f"{country_id}_country_most_answered_questions", json_lib.dumps(questions), ex=600)  # Cache for 10 minutes
     return json(body=questions)
 
 
@@ -128,6 +142,12 @@ async def get_recent_questions(request: Request):
 
 @bp.get("/recent/by-city/<city_id:int>")
 async def get_recent_questions_by_city(request: Request, city_id: int):
+    r = request.app.ctx.redis
+
+    cached = await r.get(f"{city_id}_city_recent_questions")
+    if cached:
+        return json(body=json_lib.loads(cached))
+
     offset = int(request.args.get("offset", 0))
     limit = int(request.args.get("limit", 10))
 
@@ -136,11 +156,18 @@ async def get_recent_questions_by_city(request: Request, city_id: int):
     if not questions:    
         raise exceptions.NotFound("No questions found for the specified city.")
     
+    await r.set(f"{city_id}_city_recent_questions", json_lib.dumps(questions), ex=600)  # Cache for 10 minutes
     return json(body=questions)
 
 
 @bp.get("/recent/by-country/<country_id:int>")
 async def get_recent_questions_by_country(request: Request, country_id: int):
+    r = request.app.ctx.redis
+
+    cached = await r.get(f"{country_id}_country_recent_questions")
+    if cached:
+        return json(body=json_lib.loads(cached))
+
     offset = int(request.args.get("offset", 0))
     limit = int(request.args.get("limit", 10))
 
@@ -149,6 +176,7 @@ async def get_recent_questions_by_country(request: Request, country_id: int):
     if not questions:    
         raise exceptions.NotFound("No questions found for the specified country.")
     
+    await r.set(f"{country_id}_country_recent_questions", json_lib.dumps(questions), ex=600)  # Cache for 10 minutes
     return json(body=questions)
 
 

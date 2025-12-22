@@ -16,8 +16,15 @@ async def get_city(request: Request, city_id: int):
 
 @bp.get("/<city_id:int>/counts")
 async def get_city_qa_counts(request: Request, city_id: int):
+    r = request.app.ctx.redis
+
+    cached = await r.get(f"{city_id}_city_qa_counts")
+    if cached:
+        return json(body=json_lib.loads(cached))
+
     counts = await asyncio.to_thread(request.app.ctx.db.get_city_question_and_answer_counts, city_id=city_id)
 
+    await r.set(f"{city_id}_city_qa_counts", json_lib.dumps(counts), ex=600)  # Cache for 10 minutes
     return json(body=counts)
 
 

@@ -790,6 +790,24 @@ class Database:
 
         return Converter.categories_with_stats_query_to_list(categories)
 
+    def post_register_user(self, username: str, e_mail_addr: str, password: str, full_name: str = None, city_id: int = None) -> bool:
+        new_user = Users(
+            username=username,
+            e_mail_addr=e_mail_addr,
+            password=password,
+            full_name=full_name,
+            city_id=city_id
+        )
+
+        self.__session.add(new_user)
+
+        try:
+            self.__session.commit()
+            return True
+        except Exception as e:
+            self.__session.rollback()
+            return False
+
     def get_user_info(self, username: str) -> dict:
         user = self.__session.query(
             Users.city_id,

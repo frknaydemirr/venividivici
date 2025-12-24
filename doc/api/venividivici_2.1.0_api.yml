@@ -851,6 +851,25 @@ paths:
         default:
           description: Unexpected error
 
+  /users/register:
+    post:
+      tags:
+        - users
+      summary: Register a new user
+      description: Registers new user
+      parameters:
+        - name: body
+          in: body
+          description: User registration object
+          required: true
+          schema:
+            $ref: '#/definitions/post-user-registration'
+      responses:
+        '200':
+          description: successful operation'
+        default:
+          description: Unexpected error
+
   /users/{username}/img:
     get:
       tags:
@@ -1656,6 +1675,29 @@ definitions:
       subscription-type:
         type: boolean
         example: true
+
+  post-user-registration:
+    type: object
+    properties:
+      username:
+        type: string
+        maxLength: 32
+        example: "john_doe"
+      e-mail-addr:
+        type: string
+        maxLength: 64
+        example: "john_doe@test.com"
+      password:
+        type: string
+        maxLength: 64
+        example: "StrongPassword123!"
+      city-id:
+        type: integer
+        example: 8
+      full-name:
+        type: string
+        maxLength: 64
+        example: "John Doe"
 
   get-user-info:
     type: object

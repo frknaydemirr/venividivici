@@ -2,6 +2,9 @@ from sanic import Blueprint, Request, exceptions, json
 from server.common.check_token import check_token
 from server.common.datetime_json import datetime_to_json_formatting
 
+from server.common.check_schema import check_schema
+from server.common.schemas.replies import post_reply_schema
+
 import asyncio
 
 bp = Blueprint("Replies", url_prefix="/replies")
@@ -26,6 +29,8 @@ async def delete_reply(request: Request, reply_id: int):
 
 @bp.post("/")
 async def post_new_reply(request: Request):
+    await asyncio.to_thread(check_schema, request.json, post_reply_schema)
+
     user_id = await check_token(request)
     
     new_reply_id = await asyncio.to_thread(request.app.ctx.db.post_new_reply,

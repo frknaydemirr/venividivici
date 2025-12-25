@@ -1,6 +1,9 @@
 from sanic import Blueprint, Request, exceptions, json
 from server.common.datetime_json import datetime_to_json_formatting
 
+from server.common.check_schema import check_schema
+from server.common.schemas.users import post_user_registration_schema
+
 import asyncio
 
 bp = Blueprint("Users", url_prefix="/users")
@@ -17,6 +20,8 @@ async def get_user_info(request: Request, username: str):
 
 @bp.post("/register")
 async def register_user(request: Request):
+    await asyncio.to_thread(check_schema, request.json, post_user_registration_schema)
+
     db = request.app.ctx.db
     
     if db.get_user_exists(request.json.get("username")):

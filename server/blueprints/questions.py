@@ -2,6 +2,9 @@ from sanic import Blueprint, Request, exceptions, json
 from server.common.check_token import check_token
 from server.common.datetime_json import datetime_to_json_formatting
 
+from server.common.check_schema import check_schema
+from server.common.schemas.questions import post_question_schema
+
 import json as json_lib
 
 import asyncio
@@ -28,6 +31,8 @@ async def delete_question(request: Request, question_id: int):
 
 @bp.post("/")
 async def post_new_question(request: Request):
+    await asyncio.to_thread(check_schema, request.json, post_question_schema)
+
     user_id = await check_token(request)
     
     new_question_id = await asyncio.to_thread(request.app.ctx.db.post_new_question,

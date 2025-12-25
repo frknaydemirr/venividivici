@@ -1,6 +1,9 @@
 from sanic import Blueprint, Request, exceptions, json
 from server.common.check_token import check_token
 
+from server.common.check_schema import check_schema
+from server.common.schemas.votes import post_vote_schema
+
 import asyncio
 
 bp = Blueprint("Votes", url_prefix="/votes")
@@ -28,6 +31,8 @@ async def get_user_vote_for_question(request: Request, question_id: int):
 
 @bp.post("/questions/<question_id:int>")
 async def post_user_vote_for_question(request: Request, question_id: int):
+    await asyncio.to_thread(check_schema, request.json, post_vote_schema)
+
     user_id = await check_token(request)
 
     vote_type = request.json["vote-type"]
@@ -62,6 +67,8 @@ async def get_user_vote_for_answer(request: Request, answer_id: int):
 
 @bp.post("/answers/<answer_id:int>")
 async def post_user_vote_for_answer(request: Request, answer_id: int):
+    await asyncio.to_thread(check_schema, request.json, post_vote_schema)
+
     user_id = await check_token(request)
 
     vote_type = request.json["vote-type"]
@@ -96,6 +103,8 @@ async def get_user_vote_for_reply(request: Request, reply_id: int):
 
 @bp.post("/replies/<reply_id:int>")
 async def post_user_vote_for_reply(request: Request, reply_id: int):
+    await asyncio.to_thread(check_schema, request.json, post_vote_schema)
+
     user_id = await check_token(request)
 
     vote_type = request.json["vote-type"]

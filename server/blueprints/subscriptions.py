@@ -1,6 +1,9 @@
 from sanic import Blueprint, Request, exceptions, json
 from server.common.check_token import check_token
 
+from server.common.check_schema import check_schema
+from server.common.schemas.subscriptions import post_city_sub_unsub_schema, post_country_sub_unsub_schema
+
 import asyncio
 
 bp = Blueprint("Subscriptions", url_prefix="/subscriptions")
@@ -34,6 +37,8 @@ async def get_user_city_subscriptions(request: Request):
 
 @bp.post("/cities")
 async def post_user_city_subscription(request: Request):
+    await asyncio.to_thread(check_schema, request.json, post_city_sub_unsub_schema)
+
     user_id = await check_token(request)
 
     city_id = request.json["city-id"]
@@ -60,6 +65,8 @@ async def get_user_country_subscriptions(request: Request):
 
 @bp.post("/countries")
 async def post_user_country_subscription(request: Request):
+    await asyncio.to_thread(check_schema, request.json, post_country_sub_unsub_schema)
+
     user_id = await check_token(request)
 
     country_id = request.json["country-id"]

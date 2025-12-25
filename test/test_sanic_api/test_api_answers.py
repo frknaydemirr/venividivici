@@ -1,4 +1,6 @@
 from sanic import Sanic
+from server.common.check_schema import check_schema
+from server.common.schemas.answers import get_answer_schema, get_answer_counts_schema, get_multiple_answers_schema, get_new_answer_id_schema
 
 entry_user_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjozfQ.umJRxDK7r36DCM6QxR-kSJFWLRJD2Kssk-t9GF84goQ" # user_id=3, username=entry_post_delete_user
 
@@ -19,6 +21,7 @@ def test_post_answer(sanic_instance: Sanic):
     }, headers={"Authorization": f"Bearer {entry_user_token}"})
 
     assert post_resp.status == 200
+    assert check_schema(post_resp.json, get_new_answer_id_schema)
     new_answer_id = post_resp.json.get("answer-id")
     assert new_answer_id is not None
 
@@ -32,6 +35,7 @@ def test_get_answer(sanic_instance: Sanic):
     get_req, get_resp = sanic_instance.test_client.get("/answers/3")
 
     assert get_resp.status == 200
+    assert check_schema(get_resp.json, get_answer_schema)
     assert get_resp.json["answer-body"] == "get answer body"
 
 
@@ -39,6 +43,7 @@ def test_get_answers_by_question(sanic_instance: Sanic):
     get_req, get_resp = sanic_instance.test_client.get("/answers/by-question/12?offset=0&limit=5")
 
     assert get_resp.status == 200
+    assert check_schema(get_resp.json, get_multiple_answers_schema)
     assert len(get_resp.json) == 2
 
     accepted_bodies = ['first answer of question body', 'second answer of question body']
@@ -51,6 +56,7 @@ def test_get_answers_by_user(sanic_instance: Sanic):
     get_req, get_resp = sanic_instance.test_client.get("/answers/by-user/entry_get_user?offset=0&limit=10")
 
     assert get_resp.status == 200
+    assert check_schema(get_resp.json, get_multiple_answers_schema)
     assert len(get_resp.json) == 3
 
     accepted_bodies = ['first answer of question body', 'second answer of question body', 'get answer body']

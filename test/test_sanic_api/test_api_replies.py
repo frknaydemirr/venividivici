@@ -1,4 +1,6 @@
 from sanic import Sanic
+from server.common.check_schema import check_schema
+from server.common.schemas.replies import get_reply_schema, get_multiple_replies_schema, get_new_reply_id_schema
 
 entry_user_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjozfQ.umJRxDK7r36DCM6QxR-kSJFWLRJD2Kssk-t9GF84goQ" # user_id=3, username=entry_post_delete_user
 
@@ -19,6 +21,7 @@ def test_post_reply(sanic_instance: Sanic):
     }, headers={"Authorization": f"Bearer {entry_user_token}"})
 
     assert post_resp.status == 200
+    assert check_schema(post_resp.json, get_new_reply_id_schema)
     new_reply_id = post_resp.json.get("reply-id")
     assert new_reply_id is not None
 
@@ -32,6 +35,7 @@ def test_get_reply(sanic_instance: Sanic):
     get_req, get_resp = sanic_instance.test_client.get("/replies/3")
 
     assert get_resp.status == 200
+    assert check_schema(get_resp.json, get_reply_schema)
     assert get_resp.json["reply-body"] == "get reply body"
 
 
@@ -39,6 +43,7 @@ def test_get_replies_of_answer(sanic_instance: Sanic):
     get_req, get_resp = sanic_instance.test_client.get("/replies/by-answer/6")
 
     assert get_resp.status == 200
+    assert check_schema(get_resp.json, get_multiple_replies_schema)
     assert len(get_resp.json) == 2
 
     for reply in get_resp.json:
@@ -49,5 +54,6 @@ def test_get_replies_of_user(sanic_instance: Sanic):
     get_req, get_resp = sanic_instance.test_client.get("/replies/by-user/replies_user")
 
     assert get_resp.status == 200
+    assert check_schema(get_resp.json, get_multiple_replies_schema)
     assert len(get_resp.json) == 1
     assert get_resp.json[0]["reply-id"] == 6

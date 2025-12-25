@@ -1,4 +1,6 @@
 from sanic import Sanic
+from server.common.check_schema import check_schema
+from server.common.schemas.votes import get_vote_schema
 
 vote_user_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyfQ.x2qTf1GqvXtZD94dnyh9BlRMgOIxB2-PxUn3EAaSuq8" # user_id=2, username=vote_user
 
@@ -6,6 +8,7 @@ def test_get_question_vote(sanic_instance: Sanic):
     request, response = sanic_instance.test_client.get("/votes/questions/1", headers={"Authorization": f"Bearer {vote_user_token}"})
 
     assert response.status == 200
+    assert check_schema(response.json, get_vote_schema)
     assert response.json["vote-type"] == True
 
 
@@ -34,6 +37,7 @@ def test_get_answer_vote(sanic_instance: Sanic):
     request, response = sanic_instance.test_client.get("/votes/answers/1", headers={"Authorization": f"Bearer {vote_user_token}"})
 
     assert response.status == 200
+    assert check_schema(response.json, get_vote_schema)
     assert response.json["vote-type"] == True
 
 
@@ -60,6 +64,7 @@ def test_get_reply_vote(sanic_instance: Sanic):
     request, response = sanic_instance.test_client.get("/votes/replies/1", headers={"Authorization": f"Bearer {vote_user_token}"})
 
     assert response.status == 200
+    assert check_schema(response.json, get_vote_schema)
     assert response.json["vote-type"] == True
 
 

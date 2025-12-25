@@ -832,6 +832,23 @@ class Database:
         
         return user is not None
 
+    def get_email_exists(self, e_mail_addr: str) -> bool:
+        user = self.__session.query(Users.user_id) \
+            .filter(Users.e_mail_addr == e_mail_addr) \
+            .filter(Users.active == True) \
+            .first()
+        
+        return user is not None
+
+    def get_valid_password(self, password: str) -> bool:
+        # Password complexity check: at least 8 characters, one uppercase, one lowercase, one digit
+        if (len(password) < 8 or
+            not any(c.islower() for c in password) or
+            not any(c.isupper() for c in password) or
+            not any(c.isdigit() for c in password)):
+            return False
+        return True
+
     def get_user_exists_by_id(self, user_id: int) -> bool:
         user = self.__session.query(Users.user_id) \
             .filter(Users.user_id == user_id) \

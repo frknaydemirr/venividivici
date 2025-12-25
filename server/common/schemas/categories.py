@@ -12,7 +12,7 @@ get_category_schema = {
 get_multiple_categories_schema = {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "array",
-    "items": get_category,
+    "items": get_category_schema,
     "additionalProperties": False
 }
 

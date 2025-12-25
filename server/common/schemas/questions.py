@@ -43,7 +43,7 @@ get_new_question_id_schema = {
 get_multiple_questions_schema = {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "array",
-    "items": get_question,
+    "items": get_question_schema,
     "additionalProperties": False
 }
 

@@ -36,7 +36,7 @@ get_new_answer_id_schema = {
 get_multiple_answers_schema = {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "array",
-    "items": get_answer,
+    "items": get_answer_schema,
     "additionalProperties": False
 }
 

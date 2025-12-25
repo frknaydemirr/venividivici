@@ -14,7 +14,7 @@ get_city_schema = {
 get_multiple_cities_schema = {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "array",
-    "items": get_city,
+    "items": get_city_schema,
     "additionalProperties": False
 }
 

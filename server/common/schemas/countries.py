@@ -14,7 +14,7 @@ get_country_schema = {
 get_multiple_countries_schema = {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "array",
-    "items": get_country,
+    "items": get_country_schema,
     "additionalProperties": False
 }
 

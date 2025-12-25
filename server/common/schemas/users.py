@@ -1,4 +1,4 @@
-get_user_info_schema_schema = {
+get_user_info_schema = {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "object",
     "properties": {
@@ -9,7 +9,7 @@ get_user_info_schema_schema = {
     "required": ["username", "creation-time", "city-id"],
 }
 
-post_user_registration_schema_schema = {
+post_user_registration_schema = {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "object",
     "properties": {

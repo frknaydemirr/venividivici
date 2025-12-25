@@ -1,5 +1,3 @@
-# TODO: Add delete helpers tests
-
 from sqlalchemy.orm import Session
 import pytest
 from server.database.crud import Database

@@ -1,5 +1,3 @@
-# TODO: Fix helpers tests after change in helper functions
-
 from sqlalchemy.orm import Session
 import pytest
 from server.database.crud import Database

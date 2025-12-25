@@ -1,6 +1,7 @@
 # TODO: Add questions by category endpoints
 # TODO: Put upper limit on limit parameters
-# TODO: Put all hosts, ports to .env file
+# TODO: Put all hosts, ports to .env file (do it before conteinerization)
+# TODO: Implement JSON schema validation to all endpoints
 
 from sanic import Sanic, Request, json, exceptions, file
 from http import HTTPMethod

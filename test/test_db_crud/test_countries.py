@@ -44,7 +44,7 @@ def test_get_specific_country(db_session: Session):
     assert country == {
             "country-id": 2,
             "country-name": "USA",
-            "url": None,
+            "url": "",
             "info": "Test country: USA"
         }
 
@@ -58,7 +58,7 @@ def test_get_most_conquered_countries(db_session: Session):
             {
                 "country-id": 1,
                 "country-name": "Turkey",
-                "url": None,
+                "url": "",
                 "info": "Test country: Turkey"
             }
         ]

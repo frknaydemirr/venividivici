@@ -66,8 +66,8 @@ class Converter:
             city_list.append({
                 "city-id": city.city_id,
                 "city-name": city.city_name,
-                "url": city.city_img_url,
-                "info": city.city_info
+                "url": city.city_img_url if city.city_img_url else "",
+                "info": city.city_info if city.city_info else ""
             })
         
         return city_list
@@ -80,8 +80,8 @@ class Converter:
             country_list.append({
                 "country-id": country.country_id,
                 "country-name": country.country_name,
-                "url": country.country_img_url,
-                "info": country.country_info
+                "url": country.country_img_url if country.country_img_url else "",
+                "info": country.country_info if country.country_info else ""
             })
         
         return country_list
@@ -176,8 +176,8 @@ class Database:
         return {
             "city-id": city.city_id,
             "city-name": city.city_name,
-            "url": city.city_img_url,
-            "info": city.city_info
+            "url": city.city_img_url if city.city_img_url else "",
+            "info": city.city_info if city.city_info else ""
         }
 
     def get_city_question_and_answer_counts(self, city_id: int) -> dict:
@@ -310,8 +310,8 @@ class Database:
         return {
             "country-id": country.country_id,
             "country-name": country.country_name,
-            "url": country.country_img_url,
-            "info": country.country_info
+            "url": country.country_img_url if country.country_img_url else "",
+            "info": country.country_info if country.country_info else ""
         }
 
     def get_most_conquered_countries(self, limit: int) -> list:
@@ -679,9 +679,6 @@ class Database:
             "answer-id": reply.answer_id
         }
 
-    
-
-    
 
     def get_replies_of_specific_answer(self, answer_id: int, offset: int, limit: int) -> list:
         replies = self.__session.query(*Converter.reply_query_fields) \
@@ -824,7 +821,7 @@ class Database:
         return {
             "username": user.username,
             "creation-time": user.time_created,
-            "city-id": user.city_id
+            "city-id": user.city_id if user.city_id else None
         }
 
     def get_user_exists(self, username: str) -> bool:

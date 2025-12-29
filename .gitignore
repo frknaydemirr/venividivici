@@ -1,2 +1,4 @@
 doc/database/venividivici_db.dia~
 *.cpython*
+.coverage
+logs/*

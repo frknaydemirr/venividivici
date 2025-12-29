@@ -1,5 +1,3 @@
-# TODO: Add delete helpers after cascading fix is done
-
 from sqlalchemy.orm import Session
 import pytest
 from server.database.crud import Database
@@ -15,7 +13,7 @@ def test_get_specific_city(db_session: Session):
     assert city == {
             "city-id": 1,
             "city-name": "Ankara",
-            "url": None,
+            "url": "",
             "info": "Test city: Ankara"
         }
 
@@ -41,13 +39,13 @@ def test_get_cities_in_country(db_session: Session):
             {
                 "city-id": 1,
                 "city-name": "Ankara",
-                "url": None,
+                "url": "",
                 "info": "Test city: Ankara"
             },
             {
                 "city-id": 2,
                 "city-name": "Istanbul",
-                "url": None,
+                "url": "",
                 "info": "Test city: Istanbul"
             }
         ]
@@ -62,20 +60,20 @@ def test_get_most_conquered_cities(db_session: Session):
             {
                 "city-id": 2,
                 "city-name": "Istanbul",
-                "url": None,
+                "url": "",
                 "info": "Test city: Istanbul"
             },
             {
                 "city-id": 3,
                 "city-name": "New York",
-                "url": None,
+                "url": "",
                 "info": "Test city: New York"
 
             },
             {
                 "city-id": 1,
                 "city-name": "Ankara",
-                "url": None,
+                "url": "",
                 "info": "Test city: Ankara"
             }
         ]

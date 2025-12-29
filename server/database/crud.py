@@ -66,8 +66,8 @@ class Converter:
             city_list.append({
                 "city-id": city.city_id,
                 "city-name": city.city_name,
-                "url": city.city_img_url,
-                "info": city.city_info
+                "url": city.city_img_url if city.city_img_url else "",
+                "info": city.city_info if city.city_info else ""
             })
         
         return city_list
@@ -80,8 +80,8 @@ class Converter:
             country_list.append({
                 "country-id": country.country_id,
                 "country-name": country.country_name,
-                "url": country.country_img_url,
-                "info": country.country_info
+                "url": country.country_img_url if country.country_img_url else "",
+                "info": country.country_info if country.country_info else ""
             })
         
         return country_list
@@ -111,7 +111,7 @@ class Converter:
             answer_list.append({
                 "answer-id": answer.answer_id,
                 "answer-body": answer.answer_body,
-                "answered-by": answer.username,
+                "username": answer.username,
                 "creation-time": answer.time_created,
                 "question-id": answer.question_id
             })
@@ -126,7 +126,7 @@ class Converter:
             reply_list.append({
                 "reply-id": reply.reply_id,
                 "reply-body": reply.reply_body,
-                "replied-by": reply.username,
+                "username": reply.username,
                 "creation-time": reply.time_created,
                 "answer-id": reply.answer_id
             })
@@ -176,8 +176,8 @@ class Database:
         return {
             "city-id": city.city_id,
             "city-name": city.city_name,
-            "url": city.city_img_url,
-            "info": city.city_info
+            "url": city.city_img_url if city.city_img_url else "",
+            "info": city.city_info if city.city_info else ""
         }
 
     def get_city_question_and_answer_counts(self, city_id: int) -> dict:
@@ -310,8 +310,8 @@ class Database:
         return {
             "country-id": country.country_id,
             "country-name": country.country_name,
-            "url": country.country_img_url,
-            "info": country.country_info
+            "url": country.country_img_url if country.country_img_url else "",
+            "info": country.country_info if country.country_info else ""
         }
 
     def get_most_conquered_countries(self, limit: int) -> list:
@@ -679,9 +679,6 @@ class Database:
             "answer-id": reply.answer_id
         }
 
-    
-
-    
 
     def get_replies_of_specific_answer(self, answer_id: int, offset: int, limit: int) -> list:
         replies = self.__session.query(*Converter.reply_query_fields) \
@@ -790,6 +787,24 @@ class Database:
 
         return Converter.categories_with_stats_query_to_list(categories)
 
+    def post_register_user(self, username: str, e_mail_addr: str, password: str, full_name: str = None, city_id: int = None) -> bool:
+        new_user = Users(
+            username=username,
+            e_mail_addr=e_mail_addr,
+            password=password,
+            full_name=full_name,
+            city_id=city_id
+        )
+
+        self.__session.add(new_user)
+
+        try:
+            self.__session.commit()
+            return True
+        except Exception as e:
+            self.__session.rollback()
+            return False
+
     def get_user_info(self, username: str) -> dict:
         user = self.__session.query(
             Users.city_id,
@@ -806,7 +821,7 @@ class Database:
         return {
             "username": user.username,
             "creation-time": user.time_created,
-            "city-id": user.city_id
+            "city-id": user.city_id if user.city_id else None
         }
 
     def get_user_exists(self, username: str) -> bool:
@@ -816,6 +831,23 @@ class Database:
             .first()
         
         return user is not None
+
+    def get_email_exists(self, e_mail_addr: str) -> bool:
+        user = self.__session.query(Users.user_id) \
+            .filter(Users.e_mail_addr == e_mail_addr) \
+            .filter(Users.active == True) \
+            .first()
+        
+        return user is not None
+
+    def get_valid_password(self, password: str) -> bool:
+        # Password complexity check: at least 8 characters, one uppercase, one lowercase, one digit
+        if (len(password) < 8 or
+            not any(c.islower() for c in password) or
+            not any(c.isupper() for c in password) or
+            not any(c.isdigit() for c in password)):
+            return False
+        return True
 
     def get_user_exists_by_id(self, user_id: int) -> bool:
         user = self.__session.query(Users.user_id) \

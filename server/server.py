@@ -1,7 +1,5 @@
 # TODO: Add questions by category endpoints
 # TODO: Put upper limit on limit parameters
-# TODO: Put all hosts, ports to .env file (do it before conteinerization)
-# TODO: Implement JSON schema validation to all endpoints
 
 from sanic import Sanic, Request, json, exceptions, file
 from http import HTTPMethod
@@ -12,6 +10,7 @@ from server.database.models import Base
 
 from server.worker.module import setup_modules
 from server.worker.db_setup import setup_db
+from server.common.logging_config import build_log_config
 
 from sanic_redis import SanicRedis
 
@@ -39,7 +38,8 @@ def create_app(parameters = None) -> Sanic:
     module_names = DEFAULT
     app_name = os.getenv("APP_NAME")
 
-    app = Sanic(name=app_name)
+    log_config = build_log_config(app_name)
+    app = Sanic(name=app_name, log_config=log_config)
 
     db_url = os.getenv("DATABASE_URL")
     setup_db(app_name=app_name, db_url=db_url)
@@ -75,7 +75,8 @@ def create_test_app(parameters = None, external_session = None) -> Sanic:
 
     app_name = os.getenv("APP_NAME")
 
-    app = Sanic(name=app_name)
+    log_config = build_log_config(app_name)
+    app = Sanic(name=app_name, log_config=log_config)
     db_url = ""
 
     if not external_session:

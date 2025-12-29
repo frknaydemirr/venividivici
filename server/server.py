@@ -10,7 +10,6 @@ from server.database.models import Base
 
 from server.worker.module import setup_modules
 from server.worker.db_setup import setup_db
-from server.common.logging_config import build_log_config
 
 from sanic_redis import SanicRedis
 
@@ -38,8 +37,7 @@ def create_app(parameters = None) -> Sanic:
     module_names = DEFAULT
     app_name = os.getenv("APP_NAME")
 
-    log_config = build_log_config(app_name)
-    app = Sanic(name=app_name, log_config=log_config)
+    app = Sanic(name=app_name)
 
     db_url = os.getenv("DATABASE_URL")
     setup_db(app_name=app_name, db_url=db_url)
@@ -75,8 +73,7 @@ def create_test_app(parameters = None, external_session = None) -> Sanic:
 
     app_name = os.getenv("APP_NAME")
 
-    log_config = build_log_config(app_name)
-    app = Sanic(name=app_name, log_config=log_config)
+    app = Sanic(name=app_name)
     db_url = ""
 
     if not external_session:

@@ -1,14 +1,25 @@
 import logging
 import os
-from copy import deepcopy
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 
 from sanic.log import LOGGING_CONFIG_DEFAULTS
 
 DEFAULT_LOG_LEVEL = "INFO"
 DEFAULT_MAX_BYTES = 5 * 1024 * 1024
 DEFAULT_BACKUP_COUNT = 5
+
+
+def _clone(value: Any) -> Any:
+    if isinstance(value, dict):
+        return {key: _clone(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [_clone(item) for item in value]
+    if isinstance(value, tuple):
+        return tuple(_clone(item) for item in value)
+    if isinstance(value, set):
+        return {_clone(item) for item in value}
+    return value
 
 
 def _sanitize_app_name(app_name: Optional[str]) -> str:
@@ -31,7 +42,7 @@ def _resolve_log_level(raw_level: str) -> str:
 def build_log_config(app_name: Optional[str] = None) -> dict:
     """Create a logging configuration dict with file handlers for Sanic."""
 
-    config = deepcopy(LOGGING_CONFIG_DEFAULTS)
+    config = _clone(LOGGING_CONFIG_DEFAULTS)
 
     log_dir = Path(os.getenv("LOG_DIR", os.path.join(os.getcwd(), "logs")))
     log_dir.mkdir(parents=True, exist_ok=True)

@@ -11,6 +11,9 @@ from server.database.models import Base
 from server.worker.module import setup_modules
 from server.worker.db_setup import setup_db
 
+from server.worker.setup_logger import setup_logger
+import logging
+
 from sanic_redis import SanicRedis
 
 from dotenv import load_dotenv
@@ -41,6 +44,8 @@ def create_app(parameters = None) -> Sanic:
 
     db_url = os.getenv("DATABASE_URL")
     setup_db(app_name=app_name, db_url=db_url)
+
+    setup_logger(app_name=app_name, log_level=logging.INFO)
 
     if not app.config.get("CORS-ORIGINS"):
         app.config.CORS_ORIGINS = "*"

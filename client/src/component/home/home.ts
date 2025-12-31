@@ -6,7 +6,7 @@ import { CountryService } from '../../app/services/country.service';
 import { CommonModule } from '@angular/common';
 import { Question } from '../../models/questions.model';
 import { QuestionService } from '../../app/services/question.service';
-
+import { host } from '../../app/constant';
 @Component({
   selector: 'app-home',
   imports: [CommonModule],
@@ -15,6 +15,7 @@ import { QuestionService } from '../../app/services/question.service';
 })
 export class Home implements OnInit {
 
+  private apiHost = host;
   // Şehirler için veriler ve sayfalama bilgileri
   mostConqueredCities: City[] = [];
   cityOffset=0;

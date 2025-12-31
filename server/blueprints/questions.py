@@ -81,7 +81,7 @@ async def get_most_answered_questions(request: Request):
     if not questions:    
         raise exceptions.NotFound("No questions found.")
     
-    await r.set("most_answered_questions", json_lib.dumps(questions), ex=600)  # Cache for 10 minutes
+    await r.set("most_answered_questions", json_lib.dumps(questions, default=datetime_to_json_formatting), ex=600)  # Cache for 10 minutes
     return json(body=questions)
 
 
@@ -101,7 +101,7 @@ async def get_most_answered_questions_by_city(request: Request, city_id: int):
     if not questions:    
         raise exceptions.NotFound("No questions found for the specified city.")
     
-    await r.set(f"{city_id}_city_most_answered_questions", json_lib.dumps(questions), ex=600)  # Cache for 10 minutes
+    await r.set(f"{city_id}_city_most_answered_questions", json_lib.dumps(questions, default=datetime_to_json_formatting), ex=600)  # Cache for 10 minutes
     return json(body=questions)
 
 
@@ -121,7 +121,7 @@ async def get_most_answered_questions_by_country(request: Request, country_id: i
     if not questions:    
         raise exceptions.NotFound("No questions found for the specified country.")
     
-    await r.set(f"{country_id}_country_most_answered_questions", json_lib.dumps(questions), ex=600)  # Cache for 10 minutes
+    await r.set(f"{country_id}_country_most_answered_questions", json_lib.dumps(questions, default=datetime_to_json_formatting), ex=600)  # Cache for 10 minutes
     return json(body=questions)
 
 
@@ -141,7 +141,7 @@ async def get_recent_questions(request: Request):
     if not questions:    
         raise exceptions.NotFound("No questions found.")
     
-    await r.set("recent_questions", json_lib.dumps(questions), ex=600)  # Cache for 10 minutes
+    await r.set("recent_questions", json_lib.dumps(questions, default=datetime_to_json_formatting), ex=600)  # Cache for 10 minutes
     return json(body=questions)
 
 
@@ -161,7 +161,7 @@ async def get_recent_questions_by_city(request: Request, city_id: int):
     if not questions:    
         raise exceptions.NotFound("No questions found for the specified city.")
     
-    await r.set(f"{city_id}_city_recent_questions", json_lib.dumps(questions), ex=600)  # Cache for 10 minutes
+    await r.set(f"{city_id}_city_recent_questions", json_lib.dumps(questions, default=datetime_to_json_formatting), ex=600)  # Cache for 10 minutes
     return json(body=questions)
 
 
@@ -181,7 +181,7 @@ async def get_recent_questions_by_country(request: Request, country_id: int):
     if not questions:    
         raise exceptions.NotFound("No questions found for the specified country.")
     
-    await r.set(f"{country_id}_country_recent_questions", json_lib.dumps(questions), ex=600)  # Cache for 10 minutes
+    await r.set(f"{country_id}_country_recent_questions", json_lib.dumps(questions, default=datetime_to_json_formatting), ex=600)  # Cache for 10 minutes
     return json(body=questions)
 
 

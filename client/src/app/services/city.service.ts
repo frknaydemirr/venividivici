@@ -3,13 +3,13 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { City, CityListResponse } from '../../models/city.model';
 import { Question } from '../../models/questions.model';
-
+import { host } from '../constant';
 
 @Injectable({
   providedIn: 'root',
 })
 export class CityService {
-  private apiUrl = 'https://api.example.com/cities';
+  private apiUrl = `${host}/cities`;
 
   constructor(private http:HttpClient) {}
 

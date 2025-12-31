@@ -62,7 +62,7 @@ async def get_question_answer_vote_counts(request: Request, question_id: int):
     if not counts:
         raise exceptions.NotFound("Question not found.")
 
-    return json(body=counts)
+    return json(body=counts, default=datetime_to_json_formatting)
 
 
 @bp.get("/most-answered")
@@ -82,7 +82,7 @@ async def get_most_answered_questions(request: Request):
         raise exceptions.NotFound("No questions found.")
     
     await r.set("most_answered_questions", json_lib.dumps(questions, default=datetime_to_json_formatting), ex=600)  # Cache for 10 minutes
-    return json(body=questions)
+    return json(body=questions, default=datetime_to_json_formatting)
 
 
 @bp.get("/most-answered/by-city/<city_id:int>")
@@ -102,7 +102,7 @@ async def get_most_answered_questions_by_city(request: Request, city_id: int):
         raise exceptions.NotFound("No questions found for the specified city.")
     
     await r.set(f"{city_id}_city_most_answered_questions", json_lib.dumps(questions, default=datetime_to_json_formatting), ex=600)  # Cache for 10 minutes
-    return json(body=questions)
+    return json(body=questions, default=datetime_to_json_formatting)
 
 
 @bp.get("/most-answered/by-country/<country_id:int>")
@@ -122,7 +122,7 @@ async def get_most_answered_questions_by_country(request: Request, country_id: i
         raise exceptions.NotFound("No questions found for the specified country.")
     
     await r.set(f"{country_id}_country_most_answered_questions", json_lib.dumps(questions, default=datetime_to_json_formatting), ex=600)  # Cache for 10 minutes
-    return json(body=questions)
+    return json(body=questions, default=datetime_to_json_formatting)
 
 
 @bp.get("/recent")
@@ -142,7 +142,7 @@ async def get_recent_questions(request: Request):
         raise exceptions.NotFound("No questions found.")
     
     await r.set("recent_questions", json_lib.dumps(questions, default=datetime_to_json_formatting), ex=600)  # Cache for 10 minutes
-    return json(body=questions)
+    return json(body=questions, default=datetime_to_json_formatting)
 
 
 @bp.get("/recent/by-city/<city_id:int>")
@@ -162,7 +162,7 @@ async def get_recent_questions_by_city(request: Request, city_id: int):
         raise exceptions.NotFound("No questions found for the specified city.")
     
     await r.set(f"{city_id}_city_recent_questions", json_lib.dumps(questions, default=datetime_to_json_formatting), ex=600)  # Cache for 10 minutes
-    return json(body=questions)
+    return json(body=questions, default=datetime_to_json_formatting)
 
 
 @bp.get("/recent/by-country/<country_id:int>")
@@ -182,7 +182,7 @@ async def get_recent_questions_by_country(request: Request, country_id: int):
         raise exceptions.NotFound("No questions found for the specified country.")
     
     await r.set(f"{country_id}_country_recent_questions", json_lib.dumps(questions, default=datetime_to_json_formatting), ex=600)  # Cache for 10 minutes
-    return json(body=questions)
+    return json(body=questions, default=datetime_to_json_formatting)
 
 
 @bp.get("/by-user/<username:str>")

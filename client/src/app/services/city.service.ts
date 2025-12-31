@@ -41,4 +41,9 @@ getRecentQuestionsByCity(cityId: number): Observable<Question[]> {
   return this.http.get<Question[]>(`${this.apiUrl}/questions/recent/by-city/${cityId}`);
 }
 
+//searchbox for city 
+searchCities(query: string): Observable<City[]> {
+  return this.http.get<City[]>(`${host}/search/cities/${query}`);
+}
+
 }

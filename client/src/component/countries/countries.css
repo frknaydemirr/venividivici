@@ -1,0 +1,5 @@
+.list-group-item:hover, 
+.list-group-item:focus {
+    background-color: #f8f9fa; /* Hafif bir gri tonu */
+    border-left: 4px solid #007bff; /* Seçili olduğunu belli eden bir şerit */
+}

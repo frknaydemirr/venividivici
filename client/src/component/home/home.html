@@ -1,84 +1,93 @@
-<div class="center-content-wrapper">
+<div class="container py-5">
+<div class="search-section text-center mb-5">
+    <h2 class="display-5 fw-bold mb-4">Where To Conquer?</h2>
     
-    <h3 class="text-center">Where To Concuer?</h3>
-    <form class="form-inline my-2 my-lg-0 text">
-        <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-        <i class="fa-solid fa-magnifying-glass"></i>
-    </form>
-
-    <h3 class="text-center">Most Concuered Cities</h3>
+    <app-search-box></app-search-box>
     
-    <div class="city-list-container">
-        <div *ngFor="let city of mostConqueredCities" class="city-item">
-            <img [src]="city.url" [alt]="city['city-name']" style="max-width: 100px;">
-            <h4>{{ city['city-name'] }}</h4>
-            </div>
-    </div>
-
-    <button 
-        class="btn btn-outline-primary" 
-        (click)="loadMostConqueredCities()"
-        *ngIf="hasMoreCities">
-        Load More Cities
-    </button>
-    <div *ngIf="!hasMoreCities && mostConqueredCities.length > 0" class="text-center">Tüm şehirler yüklendi.</div>
-    
-    <h3 class="text-center">Most Concuered Countries</h3>
-
-    <div class="country-list-container">
-        <div *ngFor="let country of mostConqueredCountries" class="country-item">
-            <img [src]="country.url" [alt]="country['country-name']" style="max-width: 100px;">
-            <h4>{{ country['country-name'] }}</h4>
-            </div>
-    </div>
-    
-<h3 class="text-center">Questions from Subscriptions</h3>
-<div class="question-list-container">
-<div *ngFor="let q of subscriptionQuestions" class="question-item d-flex mb-3 p-2 border-bottom">
-    <img [src]="'${apiHost}/users/' + q.username + '/img'" class="rounded-circle mr-3" style="width: 50px; height: 50px; object-fit: cover;">
-    
-    <div class="flex-grow-1">
-      <div class="d-flex justify-content-between">
-        <span class="badge badge-info">Subscription</span> 
-        <small class="text-muted">{{ q['creation-time'] | date:'mediumDate' }}</small>
-      </div>
-      
-      <h5 class="mt-1"><strong>{{ q['question-title'] }}</strong></h5>
-      <p class="text-secondary small">{{ q['question-body'] | slice:0:100 }}...</p>
-      
-      <div class="d-flex justify-content-between align-items-center">
-        <span class="small font-weight-bold">{{ q.username }}</span>
-        <span class="text-primary small">View Details</span> 
-      </div>
-    </div>
-  </div>
 </div>
 
-<hr>
+    <section class="mb-5">
+        <h3 class="section-title">Most Conquered Cities</h3>
+        <div class="row g-4 mb-4">
+            <div *ngFor="let city of mostConqueredCities" class="col-6 col-md-3 col-lg-2">
+                <div class="conquer-card text-center">
+                    <div class="img-wrapper mb-2">
+                        <img [src]="city.url" [alt]="city['city-name']" class="img-fluid rounded">
+                    </div>
+                    <h5 class="city-name">{{ city['city-name'] }}</h5>
+                </div>
+            </div>
+        </div>
+        <div class="text-center">
+            <button class="btn btn-custom" (click)="loadMostConqueredCities()" *ngIf="hasMoreCities">
+                Explore More Cities
+            </button>
+            <div *ngIf="!hasMoreCities && mostConqueredCities.length > 0" class="text-muted small italic">Tüm şehirler yüklendi.</div>
+        </div>
+    </section>
 
-<h3 class="text-center">Hot Questions</h3>
-<div class="question-list-container">
-  <div *ngFor="let q of hotQuestions" class="question-item d-flex mb-3 p-2 border-bottom">
-    <img [src]="'${apiHost}/users/' + q.username + '/img'" class="rounded-circle mr-3" style="width: 50px; height: 50px; object-fit: cover;">
-    
-    <div class="flex-grow-1">
-      <div class="d-flex justify-content-between">
-        <span class="badge badge-warning">Hot</span> 
-        <small class="text-muted">{{ q['creation-time'] | date:'mediumDate' }}</small>
-      </div>
-      
-      <h5 class="mt-1"><strong>{{ q['question-title'] }}</strong></h5>
-      <p class="text-secondary small">{{ q['question-body'] | slice:0:100 }}...</p>
-      
-      <div class="d-flex justify-content-between align-items-center">
-        <span class="small font-weight-bold">{{ q.username }}</span>
-        <span class="text-primary small">Trending now</span> 
-      </div>
+    <section class="mb-5">
+        <h3 class="section-title">Most Conquered Countries</h3>
+        <div class="row g-4">
+            <div *ngFor="let country of mostConqueredCountries" class="col-6 col-md-3 col-lg-2">
+                <div class="conquer-card text-center">
+                    <div class="img-wrapper mb-2">
+                        <img [src]="country.url" [alt]="country['country-name']" class="img-fluid rounded shadow-sm">
+                    </div>
+                    <h5 class="city-name">{{ country['country-name'] }}</h5>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <hr class="my-5 opacity-10">
+
+    <div class="row">
+        <div class="col-lg-6 mb-4">
+            <h3 class="section-title">Questions from Subscriptions</h3>
+            <div class="question-scroll-container">
+                <div *ngFor="let q of subscriptionQuestions" class="card question-card mb-3 shadow-sm">
+                    <div class="card-body d-flex">
+                        <img [src]="'${apiHost}/users/' + q.username + '/img'" class="user-avatar rounded-circle shadow-sm me-3">
+                        <div class="flex-grow-1">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <span class="badge rounded-pill bg-soft-info text-info mb-2">Subscription</span>
+                                <small class="text-muted">{{ q['creation-time'] | date:'mediumDate' }}</small>
+                            </div>
+                            <h5 class="card-title h6 fw-bold text-dark">{{ q['question-title'] }}</h5>
+                            <p class="card-text text-secondary small text-truncate-2">{{ q['question-body'] | slice:0:100 }}...</p>
+                            <div class="d-flex justify-content-between align-items-center mt-2 border-top pt-2">
+                                <span class="small fw-bold text-dark">@{{ q.username }}</span>
+                                <a href="#" class="text-decoration-none small fw-bold">View Details →</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6 mb-4">
+            <h3 class="section-title">Hot Questions</h3>
+            <div class="question-scroll-container">
+                <div *ngFor="let q of hotQuestions" class="card question-card mb-3 shadow-sm border-start border-warning border-4">
+                    <div class="card-body d-flex">
+                        <img [src]="'${apiHost}/users/' + q.username + '/img'" class="user-avatar rounded-circle shadow-sm me-3">
+                        <div class="flex-grow-1">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <span class="badge rounded-pill bg-soft-warning text-warning mb-2">🔥 Hot</span>
+                                <small class="text-muted">{{ q['creation-time'] | date:'mediumDate' }}</small>
+                            </div>
+                            <h5 class="card-title h6 fw-bold text-dark">{{ q['question-title'] }}</h5>
+                            <p class="card-text text-secondary small text-truncate-2">{{ q['question-body'] | slice:0:100 }}...</p>
+                            <div class="d-flex justify-content-between align-items-center mt-2 border-top pt-2">
+                                <span class="small fw-bold text-dark">@{{ q.username }}</span>
+                                <span class="text-danger small fw-bold italic">Trending now</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button class="btn btn-outline-primary w-100 mt-3 shadow-sm">Load More Questions</button>
+        </div>
     </div>
-  </div>
-</div>
-
-<button class="btn btn-outline-primary d-block mx-auto mt-3">Load More Questions</button>
-
-    <button class="btn btn-outline-primary">Load More Questions</button>
 </div>

@@ -1,5 +1,13 @@
 <div class="city-page-container" *ngIf="!isLoading && selectedCity; else loadingTemplate">
   
+<div class="action-bar d-flex justify-content-between align-items-center mb-4">
+  <div class="flex-grow-1 me-3">
+    <app-search-box></app-search-box> 
+  </div>
+  <button class="btn btn-outline-dark">Ask a question</button>
+</div>
+
+
   <div class="city-header d-flex align-items-center mb-4">
     <img [src]="selectedCity.url" [alt]="selectedCity['city-name']" class="city-main-img mr-4" style="width: 300px; border-radius: 8px;">
     <div>

@@ -7,9 +7,10 @@ import { CommonModule } from '@angular/common';
 import { Question } from '../../models/questions.model';
 import { QuestionService } from '../../app/services/question.service';
 import { host } from '../../app/constant';
+import { SearchBoxComponent } from '../search.component/search.component';
 @Component({
   selector: 'app-home',
-  imports: [CommonModule],
+  imports: [CommonModule, SearchBoxComponent],
   templateUrl: './home.html',
   styleUrl: './home.css',
 })

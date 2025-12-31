@@ -1,3 +1,7 @@
+.search-icon {
+    cursor: pointer;
+}
+
 .list-group-item:hover, 
 .list-group-item:focus {
     background-color: #f8f9fa; /* Hafif bir gri tonu */

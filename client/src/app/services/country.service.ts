@@ -26,4 +26,9 @@ export class CountryService {
    getCountryById(countryId: number): Observable<any> {
      return this.http.get<any>(`${this.apiUrl}/${countryId}`);
    }
+
+   //searchbox for country
+   searchCountries(query: string): Observable<any[]> {
+  return this.http.get<any[]>(`${host}/search/countries/${query}`);
+}
 }

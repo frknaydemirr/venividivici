@@ -3,14 +3,15 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { City } from '../../models/city.model';
 import { CityService } from '../../app/services/city.service';
-
+import { SearchBoxComponent } from '../search.component/search.component';
 
 @Component({
   selector: 'app-cities',
   standalone: true, 
   imports: [
     
-    CommonModule
+    CommonModule,
+    SearchBoxComponent
   ],
   templateUrl: './cities.html',
   styleUrl: './cities.css',

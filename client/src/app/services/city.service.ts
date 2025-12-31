@@ -21,7 +21,7 @@ export class CityService {
       .set('offset', offset.toString())
       .set('limit', limit.toString());
 
-      return this.http.get<CityListResponse>(`${this.apiUrl}/cities/most-conquered`, { params });
+      return this.http.get<CityListResponse>(`${this.apiUrl}/most-conquered`, { params });
 
 
   }
@@ -33,7 +33,7 @@ export class CityService {
 
 // Şehir sayfasındaki istatistikler için
 getCityCounts(cityId: number): Observable<{ 'question-count': number, 'answer-count': number }> {
-  return this.http.get<any>(`${this.apiUrl}/cities/${cityId}/counts`);
+  return this.http.get<any>(`${this.apiUrl}/${cityId}/counts`);
 }
 
 // Şehir bazlı sorular için

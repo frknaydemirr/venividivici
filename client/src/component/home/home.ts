@@ -33,13 +33,14 @@ export class Home implements OnInit {
   ) {}
 
 
-  //ngOnit -> call the methods for testing:
-ngOnInit() : void{
+ngOnInit(): void {
     this.loadMostConqueredCities();
     this.loadMostConqueredCountries();
     this.loadHotQuestions();
-    this.loadSubscriptionQuestions(1); // Örnek userId: 1
-  }
+    
+    // Swagger'da path parametresi olmadığı için userId gönderilmiyor
+    this.loadSubscriptionQuestions(); 
+}
 
   //cities
 loadMostConqueredCities(): void {
@@ -83,14 +84,16 @@ loadHotQuestions(): void {
       });
   }
 
-  loadSubscriptionQuestions(userId: number): void {
-    this.questionService.getSubscribedQuestions(userId, 0, 5) // Swagger: /subscriptions/questions/{user-id}
-      .subscribe({
-        next: (questions: Question[]) => {
-          this.subscriptionQuestions = questions;
-        },
-        error: (err) => console.error('Subscription questions error:', err)
-      });
+// Metodun imzasını Swagger'a göre parametresiz hale getiriyoruz
+loadSubscriptionQuestions(): void {
+  // QuestionService içindeki getSubscribedQuestions artık userId istemiyor
+  this.questionService.getSubscribedQuestions(0, 5) 
+    .subscribe({
+      next: (questions: Question[]) => {
+        this.subscriptionQuestions = questions;
+      },
+      error: (err) => console.error('Subscription questions error:', err)
+    });
   }
 
 

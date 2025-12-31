@@ -2,8 +2,10 @@ swagger: '2.0'
 info:
   title: venividivici
   description: API documentation for venividici web app.
-  version: 2.1.0
+  version: 2.1.1
 tags:
+  - name: login
+    description: Get token for user
   - name: cities
     description: Info about cities of countries
   - name: countries
@@ -31,9 +33,30 @@ securityDefinitions:
     in: header
     name: api-key-header
 
-host: "localhost:8000"
+host: "localhost:11111"
 
 paths:
+  /login:
+    post:
+      tags:
+        - login
+      summary: Get API token for user
+      description: Returns API token for user if login is successful
+      parameters:
+        - name: body
+          in: body
+          description: User login object
+          required: true
+          schema:
+            $ref: '#/definitions/post-user-login'
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/get-user-token'
+        default:
+          description: Unexpected error
+
   /cities/{city-id}:
     get:
       tags:
@@ -1713,3 +1736,22 @@ definitions:
       city-id:
         type: integer
         example: 47983324
+
+  post-user-login:
+    type: object
+    properties:
+      username:
+        type: string
+        maxLength: 32
+        example: "john_doe"
+      password:
+        type: string
+        maxLength: 64
+        example: "StrongPassword123!"
+
+  get-user-token:
+    type: object
+    properties:
+      token:
+        type: string
+        example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImpvaG5fZG9lIiwiZXhwIjoxNjA5OTU2ODAwfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"

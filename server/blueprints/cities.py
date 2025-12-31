@@ -2,6 +2,8 @@ from sanic import Blueprint, Request, exceptions, json
 import json as json_lib
 import asyncio
 
+from server.common.datetime_json import datetime_to_json_formatting
+
 bp = Blueprint("Cities", url_prefix="/cities")
 
 @bp.get("/<city_id:int>")
@@ -24,7 +26,7 @@ async def get_city_qa_counts(request: Request, city_id: int):
 
     counts = await asyncio.to_thread(request.app.ctx.db.get_city_question_and_answer_counts, city_id=city_id)
 
-    await r.set(f"{city_id}_city_qa_counts", json_lib.dumps(counts), ex=600)  # Cache for 10 minutes
+    await r.set(f"{city_id}_city_qa_counts", json_lib.dumps(counts, default=datetime_to_json_formatting), ex=600)  # Cache for 10 minutes
     return json(body=counts)
 
 
@@ -56,5 +58,5 @@ async def get_most_conquered_cities(request: Request):
     if not cities:
         raise exceptions.NotFound("No cities found.")
 
-    await r.set("most_conquered_cities", json_lib.dumps(cities), ex=600)  # Cache for 10 minutes
+    await r.set("most_conquered_cities", json_lib.dumps(cities, default=datetime_to_json_formatting), ex=600)  # Cache for 10 minutes
     return json(cities)

@@ -1,6 +1,8 @@
 from sanic import Blueprint, Request, exceptions, json
 import json as json_lib
 
+from server.common.datetime_json import datetime_to_json_formatting
+
 import asyncio
 
 bp = Blueprint("Countries", url_prefix="/countries")
@@ -18,7 +20,7 @@ async def get_all_countries(request: Request):
     if not countries:
         raise exceptions.NotFound("No countries found.")
 
-    await r.set("all_countries", json_lib.dumps(countries), ex=3600)  # Cache for 1 hour
+    await r.set("all_countries", json_lib.dumps(countries, default=datetime_to_json_formatting), ex=3600)  # Cache for 1 hour
     return json(body=countries)
 
 
@@ -35,7 +37,7 @@ async def get_country_qa_counts(request: Request, country_id: int):
     if not counts:
         raise exceptions.NotFound("Country not found.")
 
-    await r.set(f"{country_id}_country_qa_counts", json_lib.dumps(counts), ex=600)  # Cache for 10 minutes
+    await r.set(f"{country_id}_country_qa_counts", json_lib.dumps(counts, default=datetime_to_json_formatting), ex=600)  # Cache for 10 minutes
     return json(body=counts)
 
 
@@ -64,5 +66,5 @@ async def get_most_conquered_countries(request: Request):
     if not countries:
         raise exceptions.NotFound("No countries found.")
 
-    await r.set("most_conquered_countries", json_lib.dumps(countries), ex=600)  # Cache for 10 minutes
+    await r.set("most_conquered_countries", json_lib.dumps(countries, default=datetime_to_json_formatting), ex=600)  # Cache for 10 minutes
     return json(body=countries)
